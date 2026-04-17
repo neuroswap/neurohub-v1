@@ -15,13 +15,12 @@
         body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* GLOBAL ALERT BANNER */
         #global-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; background: var(--secondary); color: white; padding: 10px; text-align: center; font-family: 'Orbitron'; font-size: 0.8rem; z-index: 20000; box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4); border-bottom: 2px solid white; }
 
-        /* AUTH BOX */
+        /* AUTH */
         #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 40px; border-radius: 25px; width: 400px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); }
-        input, textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 14px; color: white; border-radius: 12px; margin-bottom: 12px; outline: none; font-family: 'Inter'; }
+        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 40px; border-radius: 25px; width: 400px; text-align: center; }
+        input, textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 14px; color: white; border-radius: 12px; margin-bottom: 12px; outline: none; }
         
         #tos-gate { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .tos-box { background: #080808; border: 1px solid var(--border); padding: 30px; border-radius: 20px; width: 450px; text-align: center; }
@@ -30,6 +29,11 @@
         .sidebar { background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .nav-tab { padding: 16px; border-radius: 15px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 12px; }
         .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.08); border: 1px solid var(--primary); }
+
+        /* SUB-TABS (Products Section) */
+        .sub-nav { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .sub-tab { cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; color: #555; padding: 5px 15px; border-radius: 5px; }
+        .sub-tab.active { color: var(--primary); background: rgba(0,242,255,0.1); }
 
         .content-area { padding: 50px; overflow-y: auto; }
         .tab-content { display: none; animation: fadeIn 0.4s ease forwards; }
@@ -66,7 +70,7 @@
 <div id="tos-gate">
     <div class="tos-box">
         <h2 style="font-family:'Orbitron'; color:var(--primary);">TERMS OF SERVICE</h2>
-        <p style="font-size:0.8rem; color:#888;">No reverse engineering. No chat abuse. Bans are permanent hardware and account locks. By entering, you agree to the NeuroHub protocol.</p>
+        <p style="font-size:0.8rem; color:#888;">No reverse engineering. No chat abuse. Bans are permanent hardware and account locks.</p>
         <button class="btn" style="width:100%" onclick="finishLogin()">ACCEPT & ENTER</button>
     </div>
 </div>
@@ -84,15 +88,24 @@
     <div class="content-area">
         <div id="products" class="tab-content active">
             <h1 style="font-family:'Orbitron';">MODULES</h1>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            
+            <div class="sub-nav">
+                <div class="sub-tab active" id="st-opt" onclick="switchProductCategory('optimizers')">OPTIMIZERS</div>
+                <div class="sub-tab" id="st-cht" onclick="switchProductCategory('cheats')">CHEATS</div>
+            </div>
+
+            <div id="cat-optimizers" class="cat-group">
                 <div class="panel">
                     <h3 style="color: var(--primary);">V6 OPTIMIZER (ELITE)</h3>
-                    <p style="font-size:0.85rem; color:#ccc; line-height: 1.5;">The definitive system optimization utility. This module executes deep-level cache clearing and registry tuning to minimize input delay and stabilize frame rates in high-stakes environments.</p>
+                    <p style="font-size:0.85rem; color:#ccc; line-height: 1.5;">The definitive system optimization utility. This module executes deep-level cache clearing and registry tuning to minimize input delay and stabilize frame rates.</p>
                     <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494771426979221694/NeuroHub_V6_Elite.exe?ex=69e3d1df&is=69e2805f&hm=30b33810ca8741e2100c22616c82dec4008a9d07821cc1f0b088c9bc461058eb&" class="btn">DOWNLOAD EXE</a>
                 </div>
+            </div>
+
+            <div id="cat-cheats" class="cat-group" style="display:none;">
                 <div class="panel">
                     <h3 style="color: var(--secondary);">KOUR.IO CHEAT</h3>
-                    <p style="font-size:0.85rem; color:#ccc; line-height: 1.5;">A comprehensive internal suite for Kour.io. Includes silent aimbot, high-definition ESP, and customizable crosshairs for precision dominance in browser-based combat.</p>
+                    <p style="font-size:0.85rem; color:#ccc; line-height: 1.5;">A comprehensive internal suite for Kour.io. Includes silent aimbot, high-definition ESP, and customizable crosshairs.</p>
                     <a href="https://raw.githubusercontent.com/neuroswap/ddos/main/kour-internal.user.js" class="btn" style="background:var(--secondary); color:white;">INSTALL SCRIPT</a>
                 </div>
             </div>
@@ -171,8 +184,9 @@
     let currentTicketId = "";
     const fingerprint = btoa(navigator.userAgent).substring(0, 16);
 
+    // AUTO-LOGIN ON STARTUP
     window.onload = () => { 
-        if(currentUser) checkBanAndLogin(); 
+        if(currentUser) { checkBanAndLogin(); } 
         listenForAlert();
     };
 
@@ -193,6 +207,18 @@
 
     function clearGlobalAlert() { db.ref('site_settings/global_alert').remove(); }
 
+    function switchProductCategory(cat) {
+        document.querySelectorAll('.cat-group').forEach(g => g.style.display = 'none');
+        document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+        if(cat === 'optimizers') {
+            document.getElementById('cat-optimizers').style.display = 'block';
+            document.getElementById('st-opt').classList.add('active');
+        } else {
+            document.getElementById('cat-cheats').style.display = 'block';
+            document.getElementById('st-cht').classList.add('active');
+        }
+    }
+
     function toggleAuthMode() {
         isSignUpMode = !isSignUpMode;
         document.getElementById('auth-title').innerText = isSignUpMode ? "NEURO SIGN UP" : "NEURO LOGIN";
@@ -205,7 +231,9 @@
         if(!u || !p) return;
         const deviceBan = await db.ref('bans/ips/' + fingerprint).once('value');
         if(deviceBan.exists()) { alert("DEVICE BANNED"); return; }
+        
         if(u === "neuro(owner)" && p === "admin") { loginSuccess(u, true); return; }
+        
         const userRef = db.ref('users/' + u);
         const snap = await userRef.once('value');
         if(isSignUpMode) {
@@ -228,9 +256,11 @@
     function finishLogin() {
         document.getElementById('tos-gate').style.display = 'none';
         document.getElementById('main-ui').style.display = 'grid';
-        if(isOwner) {
+        if(currentUser === "neuro(owner)") {
             document.getElementById('admin-tab').style.display = 'flex';
             loadUserList();
+        } else {
+            document.getElementById('admin-tab').style.display = 'none';
         }
         initHub();
     }
