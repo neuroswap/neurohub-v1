@@ -12,33 +12,32 @@
         * { cursor: crosshair !important; box-sizing: border-box; transition: 0.2s ease; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: #000; }
-
-        /* Top Right ID Badge */
+        
+        /* UID Badge */
         .id-badge { position: fixed; top: 20px; right: 20px; background: var(--glass); border: 1px solid var(--border); padding: 8px 15px; border-radius: 20px; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--primary); letter-spacing: 1px; z-index: 100; display: none; }
 
-        /* Login Screen */
+        /* Auth Gate */
         #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 50px; border-radius: 30px; width: 400px; text-align: center; }
+        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 50px; border-radius: 30px; width: 400px; text-align: center; box-shadow: 0 0 50px rgba(0, 242, 255, 0.1); }
 
-        /* Main UI */
+        /* Sidebar & Layout */
         #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
-        
-        /* Sidebar */
         .sidebar { background: rgba(0,0,0,0.95); border-right: 1px solid var(--border); padding: 30px 15px; display: flex; flex-direction: column; gap: 8px; position: relative; }
         .nav-tab { padding: 14px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; color: #666; display: flex; align-items: center; gap: 12px; }
         .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.05); border: 1px solid var(--primary); }
         
-        /* User Pill & Logout */
+        /* User Pill & Bottom Nav */
         .user-pill { margin-top: auto; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative; }
         .user-pill img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--primary); }
         .logout-menu { position: absolute; bottom: 75px; left: 15px; width: calc(100% - 30px); background: #080808; border: 1px solid var(--secondary); border-radius: 10px; display: none; padding: 10px; z-index: 200; box-shadow: 0 0 20px rgba(255, 0, 127, 0.2); }
 
-        /* Content */
+        /* Content Area */
         .content-area { padding: 50px; overflow-y: auto; }
         .tab-content { display: none; animation: fadeIn 0.4s ease forwards; }
         .tab-content.active { display: block; }
-        .panel { background: var(--glass); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
-        .btn { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.7rem; width: 100%; text-align: center; text-decoration: none; display: block; }
+        .panel { background: var(--glass); border: 1px solid var(--border); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
+        
+        .btn { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.7rem; width: 100%; text-align: center; text-decoration: none; display: block; margin-top: 10px; }
         .btn-discord { background: #5865F2; color: white; }
         .btn-secondary { background: var(--secondary); color: white; }
 
@@ -84,14 +83,28 @@
         </div>
 
         <div id="modules" class="tab-content">
-            <h2 style="font-family:'Orbitron';">CENTRAL MODULES</h2>
-            <div class="panel"><h3>V6 ELITE</h3><button class="btn">DOWNLOAD</button></div>
-            <div class="panel"><h3>KOUR INTERNAL</h3><button class="btn btn-secondary">INJECT</button></div>
+            <h2 style="font-family:'Orbitron'; margin-bottom: 25px;">CENTRAL MODULES</h2>
+            
+            <div class="panel">
+                <h3>NEUROHUB ELITE V6</h3>
+                <p style="font-size:0.8rem; color:#666;">Advanced system optimization & 40+ kernel-level features.</p>
+                <a href="https://cdn.discordapp.com/attachments/1220455589808308254/1224814986424320141/NeuroHub_Elite.exe" class="btn">DOWNLOAD UTILITY</a>
+            </div>
+
+            <div class="panel">
+                <h3 style="color:var(--secondary);">KOUR.IO INTERNAL</h3>
+                <p style="font-size:0.8rem; color:#666;">Tampermonkey: Aimbot, ESP, Speed, and Movement Exploits.</p>
+                <a href="https://raw.githubusercontent.com/neuroswap/kour/main/kour_script.user.js" class="btn btn-secondary">INSTALL SCRIPT</a>
+            </div>
         </div>
 
         <div id="events" class="tab-content">
             <h2 style="font-family:'Orbitron';">UPCOMING EVENTS</h2>
-            <div class="panel"><h3>COMMUNITY SCRIM</h3><p>Friday Night @ 8PM EST</p></div>
+            <div class="panel">
+                <h3>COMMUNITY SCRIM NIGHT</h3>
+                <p>Every Friday Night @ 8:00 PM EST. Winner gets the "Elite" role.</p>
+                <div style="color:var(--primary); font-size:0.7rem; margin-top:10px;">STATUS: SCHEDULED</div>
+            </div>
         </div>
 
         <div id="admin" class="tab-content">
@@ -117,7 +130,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const OWNER_ID = "1486348575536582736"; // PASTE YOUR NUMERICAL ID HERE
+    // Numerical ID to unlock Owner Panel
+    const OWNER_ID = "1494822241089880205"; 
 
     function loginWithDiscord() {
         const url = `https://discord.com/api/oauth2/authorize?client_id=1494822241089880205&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}&response_type=token&scope=identify%20guilds.join`;
@@ -132,9 +146,7 @@
             const resp = await fetch('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${accessToken}` } });
             const user = await resp.json();
             if (user.id) {
-                // Get Nickname (global_name) or fallback to username
                 const displayName = user.global_name || user.username;
-                
                 localStorage.setItem('nID', user.id);
                 localStorage.setItem('nNick', displayName);
                 localStorage.setItem('nPFP', `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`);
@@ -175,7 +187,7 @@
 
     function logout() { localStorage.clear(); location.reload(); }
     
-    // Background Stars
+    // Background Animation
     const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d'); let stars = [];
     function initStars() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; stars = []; for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, l:Math.random()*25+10, s:Math.random()*12+5}); }
     function drawStars() { ctx.clearRect(0,0,canvas.width, canvas.height); stars.forEach(s => { ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x, s.y+s.l); ctx.stroke(); s.y += s.s; if(s.y > canvas.height) s.y = -s.l; }); requestAnimationFrame(drawStars); }
