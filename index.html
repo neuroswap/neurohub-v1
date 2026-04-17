@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEUROHUB | Master Portal</title>
+    <title>NEUROHUB</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
@@ -150,9 +150,14 @@
                     <button class="btn btn-admin" onclick="db.ref('messages').remove()">WIPE CHAT</button>
                     <button class="btn btn-admin" onclick="setCustomAlert()">SET SYSTEM ALERT</button>
                     <button class="btn btn-admin" onclick="toggleAlert()">TOGGLE ALERT ON/OFF</button>
+                    
                     <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
-                    <input type="text" id="ban-target" placeholder="User to Ban">
-                    <button class="btn btn-admin" style="background:#ff4444;" onclick="banUser()">BAN USER & FINGERPRINT</button>
+                    
+                    <h3>BAN MANAGEMENT</h3>
+                    <input type="text" id="ban-target" placeholder="User to Ban/Unban">
+                    <button class="btn btn-admin" style="background:#ff4444;" onclick="banUser()">BAN USER & DEVICE</button>
+                    <button class="btn btn-admin" style="background:#44ff44; color:#000;" onclick="unbanUser()">UNBAN USERNAME</button>
+                    <button class="btn btn-admin" style="background:#ff9900; color:#000;" onclick="clearAllDeviceBans()">WIPE DEVICE BAN LIST</button>
                 </div>
                 <div class="panel">
                     <h3>MASTER TICKETS</h3>
@@ -183,7 +188,6 @@
 
     window.onload = () => { if(currentUser) checkAutoLogin(); };
 
-    /* --- FIXED AUTH TOGGLE LOGIC --- */
     function switchToSignUp() {
         document.getElementById('auth-title').innerText = "NEURO SIGN UP";
         document.getElementById('auth-btn').innerText = "CREATE ACCOUNT";
@@ -211,8 +215,11 @@
         if(u === "neuro(owner)" && p === "admin") { loginSuccess(u, true); return; }
 
         const snap = await db.ref('users/' + u).once('value');
-        if(snap.exists() && snap.val().pass === p) loginSuccess(u, false);
-        else alert("Invalid Credentials");
+        if(snap.exists() && snap.val().pass === p) {
+            const userBan = await db.ref('bans/users/' + u).once('value');
+            if(userBan.exists()) { alert("ACCOUNT BANNED"); return; }
+            loginSuccess(u, false);
+        } else alert("Invalid Credentials");
     }
 
     async function runSignUp() {
@@ -238,7 +245,8 @@
 
     async function checkAutoLogin() {
         const ban = await db.ref('bans/users/' + currentUser).once('value');
-        if(ban.exists()) { logout(); return; }
+        const devBan = await db.ref('bans/ips/' + fingerprint).once('value');
+        if(ban.exists() || devBan.exists()) { logout(); return; }
         document.getElementById('auth-gate').style.display = 'none';
         acceptTos();
     }
@@ -295,15 +303,31 @@
         document.getElementById('t-chat-input').value = "";
     }
 
+    /* --- UPDATED BAN LOGIC --- */
     function banUser() {
         const target = document.getElementById('ban-target').value;
+        if(!target) return;
         db.ref('users/' + target).once('value', s => {
             if(s.exists()) {
                 db.ref('bans/users/' + target).set(true);
                 if(s.val().fp) db.ref('bans/ips/' + s.val().fp).set(true);
-                alert("User and Device Banned.");
+                alert(target + " banned.");
             }
         });
+    }
+
+    function unbanUser() {
+        const target = document.getElementById('ban-target').value;
+        if(!target) return;
+        db.ref('bans/users/' + target).remove();
+        alert(target + " account unbanned.");
+    }
+
+    function clearAllDeviceBans() {
+        if(confirm("Wipe all device-level bans?")) {
+            db.ref('bans/ips').remove();
+            alert("Device ban list cleared.");
+        }
     }
 
     function deleteTicket(id) { db.ref('tickets/' + id).remove(); db.ref('ticket_msgs/' + id).remove(); }
@@ -330,7 +354,6 @@
         el.classList.add('active');
     }
 
-    /* --- NEON STARFIELD --- */
     const canvas = document.getElementById('starfield');
     const ctx = canvas.getContext('2d');
     let stars = [];
