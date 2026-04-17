@@ -3,54 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEUROHUB</title>
+    <title>NEUROHUB | ELITE</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --primary: #00f2ff; --secondary: #ff007f; --bg: #010101; --border: rgba(255, 255, 255, 0.1); }
+        :root { --primary: #00f2ff; --secondary: #ff007f; --bg: #010101; --panel: #080808; --border: rgba(255, 255, 255, 0.1); }
         * { box-sizing: border-box; transition: 0.2s; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         
-        /* AUTH & BAN */
-        #ban-screen, #auth-gate { position: fixed; inset: 0; background: #000; z-index: 20000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        #auth-gate { z-index: 10000; }
-        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 40px; border-radius: 20px; width: 350px; text-align: center; }
-        input { width: 100%; background: #111; border: 1px solid var(--border); padding: 12px; color: #fff; margin: 10px 0; border-radius: 5px; }
-
-        /* MAIN UI */
-        #main-ui { display: none; height: 100vh; grid-template-columns: 250px 1fr; }
-        .sidebar { background: #050505; border-right: 1px solid var(--border); padding: 30px 20px; }
-        .nav-tab { padding: 15px; margin: 5px 0; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; color: #666; }
-        .nav-tab.active { color: var(--primary); border-left: 3px solid var(--primary); background: rgba(0,242,255,0.05); }
-
-        .content { padding: 50px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .panel { background: #0a0a0a; border: 1px solid var(--border); padding: 25px; border-radius: 15px; }
+        /* BAN SCREEN */
+        #ban-screen { position: fixed; inset: 0; background: #000; z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; }
         
-        .btn { display: block; width: 100%; padding: 12px; background: var(--primary); color: #000; text-decoration: none; text-align: center; border-radius: 5px; font-family: 'Orbitron'; font-weight: 900; margin-top: 15px; font-size: 0.8rem; }
-        .btn:hover { opacity: 0.8; transform: scale(1.02); }
+        /* AUTH SYSTEM */
+        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: var(--panel); border: 2px solid var(--primary); padding: 40px; border-radius: 20px; width: 380px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.1); }
+        .auth-tabs { display: flex; margin-bottom: 25px; border-bottom: 1px solid var(--border); }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; font-family: 'Orbitron'; color: #555; font-size: 0.8rem; }
+        .auth-tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        
+        input { width: 100%; background: #111; border: 1px solid var(--border); padding: 14px; color: #fff; margin: 10px 0; border-radius: 8px; outline: none; }
+        input:focus { border-color: var(--primary); }
+
+        /* DASHBOARD UI */
+        #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
+        .sidebar { background: #050505; border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; }
+        .nav-tab { padding: 18px; margin: 5px 0; cursor: pointer; font-family: 'Orbitron'; font-size: 0.85rem; color: #666; border-radius: 10px; }
+        .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.05); border-left: 4px solid var(--primary); }
+
+        .content { padding: 60px; overflow-y: auto; background: radial-gradient(circle at top right, #0a0a0a, #010101); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .panel { background: var(--panel); border: 1px solid var(--border); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); color: #000; text-decoration: none; text-align: center; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; margin-top: 20px; cursor: pointer; border: none; font-size: 0.9rem; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
     </style>
 </head>
 <body>
 
-    <div id="ban-screen" style="display:none;">
-        <h1 style="font-family:'Orbitron'; color:var(--secondary);">USER BANNED</h1>
+    <div id="ban-screen">
+        <h1 style="font-family:'Orbitron'; color:var(--secondary); letter-spacing: 5px;">USER BANNED</h1>
+        <p style="color: #444;">Access Denied by System Administrator</p>
     </div>
 
     <div id="auth-gate">
         <div class="auth-box">
-            <h2 style="font-family:'Orbitron'; color:var(--primary); margin-bottom:20px;">NEUROHUB</h2>
+            <h1 style="font-family:'Orbitron'; color:var(--primary); margin-bottom: 30px;">NEUROHUB</h1>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">LOGIN</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchAuth('signup')">SIGN UP</div>
+            </div>
             <input type="text" id="user" placeholder="Username">
             <input type="password" id="pass" placeholder="Password">
-            <button onclick="login()" class="btn">LOGIN</button>
+            <button id="auth-btn" onclick="handleAuth()" class="btn">PROCEED</button>
         </div>
     </div>
 
     <div id="main-ui">
         <div class="sidebar">
-            <h2 style="font-family:'Orbitron'; color:var(--primary); margin-bottom:40px;">NEUROHUB</h2>
+            <h2 style="font-family:'Orbitron'; color:var(--primary); margin-bottom:50px; text-align: center;">NEUROHUB</h2>
             <div class="nav-tab active">PRODUCTS</div>
             <div class="nav-tab">COMMUNITY</div>
             <div class="nav-tab">SUPPORT</div>
@@ -58,17 +70,17 @@
         </div>
 
         <div class="content">
-            <h1 style="font-family:'Orbitron'; margin-bottom:30px;">DASHBOARD</h1>
+            <h1 style="font-family:'Orbitron'; font-size: 2rem; margin-bottom:40px; border-bottom: 2px solid var(--primary); display: inline-block;">DASHBOARD</h1>
             <div class="grid">
                 <div class="panel">
                     <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0;">V6 OPTIMIZER</h2>
-                    <p style="color:#777; font-size:0.8rem; margin-top:10px;">Stand-alone PC Utility. Cleans cache and reduces latency.</p>
+                    <p style="color:#777; font-size:0.85rem; margin-top:15px; line-height: 1.6;">Stand-alone PC Utility. Cleans cache and reduces latency for elite performance.</p>
                     <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494771426979221694/NeuroHub_V6_Elite.exe?ex=69e3d1df&is=69e2805f&hm=30b33810ca8741e2100c22616c82dec4008a9d07821cc1f0b088c9bc461058eb&" class="btn">DOWNLOAD EXE</a>
                 </div>
 
                 <div class="panel">
                     <h2 style="font-family:'Orbitron'; color:var(--secondary); margin:0;">kour.io cheat</h2>
-                    <p style="color:#777; font-size:0.8rem; margin-top:10px;">aimbot esp crosshair</p>
+                    <p style="color:#777; font-size:0.85rem; margin-top:15px; line-height: 1.6;">aimbot esp crosshair</p>
                     <a href="#" class="btn" style="background:var(--secondary);">INSTALL SCRIPT</a>
                 </div>
             </div>
@@ -80,20 +92,37 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function login() {
+        let authMode = 'login';
+
+        function switchAuth(mode) {
+            authMode = mode;
+            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+            document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+            document.getElementById('auth-btn').innerText = mode === 'login' ? 'LOGIN' : 'SIGN UP';
+        }
+
+        function handleAuth() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
 
-            db.ref('bans/' + u).once('value', snapshot => {
-                if(snapshot.exists()) {
-                    document.getElementById('ban-screen').style.display = 'flex';
-                } else if(u === "neuro" && p === "owner") {
-                    document.getElementById('auth-gate').style.display = 'none';
-                    document.getElementById('main-ui').style.display = 'grid';
-                } else {
-                    alert("Wrong login");
-                }
-            });
+            if(!u || !p) return alert("Fill all fields");
+
+            if(authMode === 'login') {
+                db.ref('bans/' + u).once('value', snapshot => {
+                    if(snapshot.exists()) {
+                        document.getElementById('ban-screen').style.display = 'flex';
+                    } else if(u === "neuro" && p === "owner") {
+                        document.getElementById('auth-gate').style.display = 'none';
+                        document.getElementById('main-ui').style.display = 'grid';
+                    } else {
+                        alert("Access Denied");
+                    }
+                });
+            } else {
+                // Simplified Signup for Testing
+                alert("Account created for " + u + ". Use Login now.");
+                switchAuth('login');
+            }
         }
     </script>
 </body>
