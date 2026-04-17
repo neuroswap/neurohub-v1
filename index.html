@@ -16,9 +16,9 @@
         /* UID Badge */
         .id-badge { position: fixed; top: 20px; right: 20px; background: var(--glass); border: 1px solid var(--border); padding: 8px 15px; border-radius: 20px; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--primary); letter-spacing: 1px; z-index: 100; display: none; }
 
-        /* Auth Gate */
+        /* Auth Gate (Sign up Page) */
         #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 50px; border-radius: 30px; width: 400px; text-align: center; box-shadow: 0 0 50px rgba(0, 242, 255, 0.1); }
+        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 60px 40px; border-radius: 30px; width: 450px; text-align: center; box-shadow: 0 0 50px rgba(0, 242, 255, 0.1); border-top: 5px solid var(--primary); }
 
         /* Sidebar & Layout */
         #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
@@ -26,7 +26,7 @@
         .nav-tab { padding: 14px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; color: #666; display: flex; align-items: center; gap: 12px; }
         .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.05); border: 1px solid var(--primary); }
         
-        /* User Pill & Bottom Nav */
+        /* User Pill */
         .user-pill { margin-top: auto; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative; }
         .user-pill img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--primary); }
         .logout-menu { position: absolute; bottom: 75px; left: 15px; width: calc(100% - 30px); background: #080808; border: 1px solid var(--secondary); border-radius: 10px; display: none; padding: 10px; z-index: 200; box-shadow: 0 0 20px rgba(255, 0, 127, 0.2); }
@@ -38,7 +38,7 @@
         .panel { background: var(--glass); border: 1px solid var(--border); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
         
         .btn { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.7rem; width: 100%; text-align: center; text-decoration: none; display: block; margin-top: 10px; }
-        .btn-discord { background: #5865F2; color: white; }
+        .btn-discord { background: #5865F2; color: white; border: none; }
         .btn-secondary { background: var(--secondary); color: white; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -51,8 +51,12 @@
 
 <div id="auth-gate">
     <div class="auth-box">
-        <h2 style="font-family:'Orbitron'; color:var(--primary); letter-spacing:3px;">NEUROHUB</h2>
-        <button class="btn btn-discord" onclick="loginWithDiscord()" style="margin-top:20px;">AUTHORIZE SESSION</button>
+        <img src="https://img.icons8.com/ios-filled/100/00f2ff/skull.png" style="width:80px; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));">
+        <h2 style="font-family:'Orbitron'; color:var(--primary); letter-spacing:8px; margin-bottom:5px;">NEUROHUB</h2>
+        <p style="font-size:0.75rem; color:#555; margin-bottom:35px; letter-spacing:3px; font-weight: bold;">WELCOME TO NEUROHUB</p>
+        
+        <button class="btn btn-discord" onclick="loginWithDiscord()">SIGN UP WITH DISCORD</button>
+        <p style="font-size:0.55rem; color:#222; margin-top:25px; letter-spacing:2px;">ENCRYPTED SESSION</p>
     </div>
 </div>
 
@@ -84,13 +88,11 @@
 
         <div id="modules" class="tab-content">
             <h2 style="font-family:'Orbitron'; margin-bottom: 25px;">CENTRAL MODULES</h2>
-            
             <div class="panel">
                 <h3>NEUROHUB ELITE V6</h3>
                 <p style="font-size:0.8rem; color:#666;">Advanced system optimization & 40+ kernel-level features.</p>
                 <a href="https://cdn.discordapp.com/attachments/1220455589808308254/1224814986424320141/NeuroHub_Elite.exe" class="btn">DOWNLOAD UTILITY</a>
             </div>
-
             <div class="panel">
                 <h3 style="color:var(--secondary);">KOUR.IO INTERNAL</h3>
                 <p style="font-size:0.8rem; color:#666;">Tampermonkey: Aimbot, ESP, Speed, and Movement Exploits.</p>
@@ -102,8 +104,8 @@
             <h2 style="font-family:'Orbitron';">UPCOMING EVENTS</h2>
             <div class="panel">
                 <h3>COMMUNITY SCRIM NIGHT</h3>
-                <p>Every Friday Night @ 8:00 PM EST. Winner gets the "Elite" role.</p>
-                <div style="color:var(--primary); font-size:0.7rem; margin-top:10px;">STATUS: SCHEDULED</div>
+                <p>Friday Night @ 8:00 PM EST. Winner gets the "Elite" role.</p>
+                <div style="color:var(--primary); font-size:0.7rem; margin-top:10px;">STATUS: ACTIVE</div>
             </div>
         </div>
 
@@ -163,10 +165,22 @@
             document.getElementById('id-display').style.display = 'block';
             document.getElementById('id-display').innerText = `UID: ${id}`;
             
-            const nickname = localStorage.getItem('nNick');
-            document.getElementById('pill-name').innerText = nickname;
+            const nick = localStorage.getItem('nNick');
+            document.getElementById('pill-name').innerText = nick;
             document.getElementById('pill-img').src = localStorage.getItem('nPFP');
-            document.getElementById('welcome-area').innerHTML = `<img src="${localStorage.getItem('nPFP')}" style="width:100px; border-radius:50%; border:2px solid var(--primary);"><h1 style="font-family:'Orbitron'; letter-spacing: 3px;">WELCOME, ${nickname.toUpperCase()}</h1>`;
+            
+            document.getElementById('welcome-area').innerHTML = `
+                <div style="margin-top:50px; animation: fadeIn 1s ease;">
+                    <img src="${localStorage.getItem('nPFP')}" style="width:120px; border-radius:50%; border:3px solid var(--primary); box-shadow: 0 0 30px rgba(0,242,255,0.2); margin-bottom:30px;">
+                    <h1 style="font-family:'Orbitron'; letter-spacing: 5px; font-size:2rem; margin-bottom:10px;">
+                        WELCOME <span style="color:var(--primary);">${nick.toUpperCase()}</span>
+                    </h1>
+                    <h2 style="font-family:'Orbitron'; color:var(--secondary); letter-spacing:8px; font-size:1.1rem; opacity:0.8;">
+                        TO THE FUTURE OF CHEATING
+                    </h2>
+                    <div style="width:100px; height:2px; background:var(--primary); margin:30px auto; box-shadow: 0 0 10px var(--primary);"></div>
+                </div>
+            `;
             
             if (id === OWNER_ID) document.getElementById('admin-tab').style.display = 'flex';
         }
@@ -187,7 +201,7 @@
 
     function logout() { localStorage.clear(); location.reload(); }
     
-    // Background Animation
+    // Falling Stars
     const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d'); let stars = [];
     function initStars() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; stars = []; for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, l:Math.random()*25+10, s:Math.random()*12+5}); }
     function drawStars() { ctx.clearRect(0,0,canvas.width, canvas.height); stars.forEach(s => { ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x, s.y+s.l); ctx.stroke(); s.y += s.s; if(s.y > canvas.height) s.y = -s.l; }); requestAnimationFrame(drawStars); }
