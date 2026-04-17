@@ -3,461 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEUROHUB | Enterprise Portal v1.4</title>
+    <title>NEUROHUB | Master Portal</title>
     <link rel="icon" href="https://img.icons8.com/ios-filled/50/00f2ff/skull.png" type="image/png">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --primary: #00f2ff;
-            --secondary: #ff007f;
-            --bg-dark: #050505;
-            --bg-panel: rgba(15, 15, 15, 0.95);
-            --border: rgba(255, 255, 255, 0.08);
-            --sidebar-w: 280px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Base Reset */
-        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
-        body, html { 
-            height: 100vh; 
-            background: var(--bg-dark); 
-            color: #fff; 
-            font-family: 'Inter', sans-serif; 
-            overflow: hidden; 
-        }
-
+        :root { --primary: #00f2ff; --secondary: #ff007f; --bg: #010101; --panel: #0a0a0a; --border: rgba(255, 255, 255, 0.1); }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
+        
         #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        /* Global UI Elements */
-        #global-alert {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(90deg, var(--secondary), #bc005e);
-            padding: 12px;
-            text-align: center;
-            font-family: 'Orbitron';
-            font-size: 0.8rem;
-            z-index: 99999;
-            box-shadow: 0 4px 20px rgba(255, 0, 127, 0.4);
-            border-bottom: 2px solid #fff;
-            letter-spacing: 1.5px;
-        }
+        /* AUTH GATE */
+        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 40px; border-radius: 25px; width: 400px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); }
+        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 14px; color: white; border-radius: 12px; margin-bottom: 12px; outline: none; }
 
-        /* Authentication System */
-        #auth-gate { 
-            position: fixed; 
-            inset: 0; 
-            background: #000; 
-            z-index: 90000; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-        }
-        .auth-card {
-            background: #0a0a0a;
-            border: 1px solid var(--primary);
-            padding: 50px;
-            border-radius: 30px;
-            width: 440px;
-            text-align: center;
-            box-shadow: 0 0 60px rgba(0, 242, 255, 0.15);
-        }
-        .auth-card h1 { font-family: 'Orbitron'; font-weight: 900; letter-spacing: 4px; color: var(--primary); margin-bottom: 35px; }
-        
-        input, textarea {
-            width: 100%;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            padding: 16px;
-            color: #fff;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-family: 'Inter';
-            outline: none;
-        }
-        input:focus { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
+        /* MAIN UI */
+        #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
+        .sidebar { background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-tab { padding: 16px; border-radius: 15px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 12px; }
+        .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.1); border: 1px solid var(--primary); }
 
-        /* Main Dashboard Layout */
-        #main-ui { display: none; height: 100vh; grid-template-columns: var(--sidebar-w) 1fr; }
-        
-        .sidebar {
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(25px);
-            border-right: 1px solid var(--border);
-            padding: 50px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .sidebar h2 { font-family: 'Orbitron'; font-size: 1.4rem; color: var(--primary); text-align: center; margin-bottom: 50px; letter-spacing: 3px; }
-
-        .nav-item {
-            padding: 16px 20px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            font-size: 0.75rem;
-            color: #777;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: var(--transition);
-        }
-        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
-        .nav-item.active { 
-            color: var(--primary); 
-            background: rgba(0, 242, 255, 0.08); 
-            border: 1px solid rgba(0, 242, 255, 0.2);
-        }
-
-        /* Products Sub-Navigation */
-        .sub-nav { display: flex; gap: 15px; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-        .sub-tab { cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; color: #555; padding: 8px 18px; border-radius: 8px; transition: var(--transition); }
-        .sub-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.1); }
-
-        /* Content Areas */
-        .content-wrap { padding: 60px; overflow-y: auto; }
-        .tab-content { display: none; animation: slideUp 0.5s ease; }
+        /* CONTENT */
+        .content-area { padding: 50px; overflow-y: auto; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Grid & Cards (Based on your image) */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
-        .product-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            padding: 0;
-            overflow: hidden;
-            position: relative;
-        }
-        .product-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-5px); }
-        .card-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid var(--border); }
-        .card-info { padding: 30px; }
-        .card-info h3 { font-family: 'Orbitron'; color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; }
-        .card-info p { color: #aaa; font-size: 0.85rem; line-height: 1.6; }
+        /* PRODUCT TABS */
+        .sub-nav { display: flex; gap: 15px; margin-bottom: 30px; }
+        .sub-tab { cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; color: #555; padding: 8px 20px; border-radius: 8px; border: 1px solid transparent; }
+        .sub-tab.active { color: var(--primary); background: rgba(0,242,255,0.05); border-color: var(--primary); }
 
-        /* Buttons */
-        .btn {
-            background: var(--primary);
-            color: #000;
-            font-family: 'Orbitron';
-            font-weight: 900;
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 25px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
-        }
-        .btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 242, 255, 0.4); }
-        .btn-sec { background: var(--secondary); color: #fff; box-shadow: 0 5px 15px rgba(255, 0, 127, 0.2); }
+        /* PRODUCT CARDS */
+        .product-card { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; width: 450px; margin-bottom: 20px; }
+        .card-banner { width: 100%; height: 280px; background-size: cover; background-position: center; border-bottom: 1px solid var(--border); }
+        .card-body { padding: 25px; }
+        .card-title { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--primary); margin-bottom: 10px; }
+        .card-desc { font-size: 0.85rem; color: #888; line-height: 1.5; margin-bottom: 20px; }
 
-        /* Chat & Panel Styles */
-        .chat-container { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 20px; padding: 25px; height: 500px; display: flex; flex-direction: column; }
-        .chat-msgs { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; font-size: 0.9rem; padding-right: 10px; }
-        .chat-msgs b { color: var(--primary); margin-right: 8px; }
+        .btn { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 12px 25px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.75rem; text-decoration: none; display: inline-block; width: 100%; text-align: center; }
+        .btn:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--primary); }
 
-        /* Admin/Owner Controls */
-        #user-list { max-height: 300px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--border); }
-        .user-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #111; font-size: 0.8rem; }
-        
-        #logout-btn { 
-            position: absolute; bottom: 30px; left: 20px; 
-            background: none; border: 1px solid var(--secondary); color: var(--secondary);
-            padding: 8px 15px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.65rem; cursor: pointer;
-        }
+        #logout-btn { position: absolute; bottom: 20px; left: 20px; color: var(--secondary); background: none; border: 1px solid var(--secondary); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; border-radius: 5px; font-size: 0.6rem; }
     </style>
 </head>
 <body>
 
-    <div id="global-alert"></div>
-    <canvas id="starfield"></canvas>
+<canvas id="starfield"></canvas>
 
-    <div id="auth-gate">
-        <div class="auth-card">
-            <h1 id="auth-header">NEURO LOGIN</h1>
-            <input type="text" id="username" placeholder="ACCESS KEY (USER)">
-            <input type="password" id="password" placeholder="SECURITY TOKEN (PASS)">
-            <button class="btn" onclick="processAuth()">INITIALIZE</button>
-            <p id="auth-toggle" onclick="toggleAuth()" style="color:var(--primary); cursor:pointer; font-size:0.7rem; margin-top:20px; opacity:0.6;">NEW AGENT? REGISTER</p>
-        </div>
+<div id="auth-gate">
+    <div class="auth-box">
+        <h2 style="font-family: 'Orbitron'; color: var(--primary);">NEURO LOGIN</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn" onclick="handleAuth()">AUTHORIZE</button>
+        <p id="toggle-text" onclick="toggleAuthMode()" style="color:var(--primary); cursor:pointer; font-size:0.7rem; margin-top:15px; opacity:0.6;">Need an account? Sign Up</p>
+    </div>
+</div>
+
+<div id="main-ui">
+    <div class="sidebar">
+        <h2 style="font-family:'Orbitron'; color:var(--primary); text-align:center;">NEUROHUB</h2>
+        <div class="nav-tab active" onclick="showTab('products', this)">PRODUCTS</div>
+        <div class="nav-tab" onclick="showTab('chat', this)">COMMUNITY</div>
+        <div class="nav-tab" onclick="showTab('support', this)">SUPPORT</div>
+        <button id="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
-    <div id="main-ui">
-        <div class="sidebar">
-            <h2>NEUROHUB</h2>
-            <div class="nav-item active" onclick="navTo('products', this)">PRODUCTS</div>
-            <div class="nav-item" onclick="navTo('community', this)">COMMUNITY</div>
-            <div class="nav-item" onclick="navTo('support', this)">SUPPORT</div>
-            <div id="owner-nav" class="nav-item" style="display:none; color:var(--secondary);" onclick="navTo('owner', this)">OWNER PANEL</div>
-            <button id="logout-btn" onclick="performLogout()">LOGOUT SYSTEM</button>
+    <div class="content-area">
+        <div id="products" class="tab-content active">
+            <div class="sub-nav">
+                <div class="sub-tab active" id="st-opt" onclick="switchProductCategory('optimizers')">OPTIMIZERS</div>
+                <div class="sub-tab" id="st-cht" onclick="switchProductCategory('cheats')">CHEATS</div>
+            </div>
+
+            <div id="cat-optimizers">
+                <div class="product-card">
+                    <div class="card-banner" style="background-image: url('https://i.ibb.co/VpM0mKx/optimizer-preview.png');"></div>
+                    <div class="card-body">
+                        <div class="card-title">V6 OPTIMIZER (ELITE)</div>
+                        <div class="card-desc">High-tier registry and cache injection. Reduces latency by 15-30ms and stabilizes frame delivery for high-stakes competition.</div>
+                        <a href="#" class="btn">DOWNLOAD MODULE</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cat-cheats" style="display:none;">
+                <div class="product-card">
+                    <div class="card-banner" style="background-image: url('https://i.ibb.co/G3X0N7R/kour-preview.png');"></div>
+                    <div class="card-body">
+                        <div class="card-title" style="color: var(--secondary);">KOUR.IO COMPLETE MENU</div>
+                        <div class="card-desc">Advanced weapon stabilization, frame-perfect ESP, and network-level silent aim injection. Press INSERT to close.</div>
+                        <a href="#" class="btn" style="background: var(--secondary); color: white;">INSTALL SCRIPT</a>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="content-wrap">
-            
-            <div id="products" class="tab-content active">
-                <h1 style="font-family:'Orbitron'; margin-bottom:40px; font-size:2rem; letter-spacing:5px;">MODULES</h1>
-                
-                <div class="sub-nav">
-                    <div class="sub-tab active" id="tab-opt" onclick="setCategory('optimizers')">OPTIMIZERS</div>
-                    <div class="sub-tab" id="tab-cht" onclick="setCategory('cheats')">CHEATS</div>
-                </div>
+        <div id="chat" class="tab-content">
+            <h2>COMMUNITY CHAT</h2>
+            <div id="chat-display" style="height:300px; background:rgba(0,0,0,0.2); padding:15px; overflow-y:auto; border-radius:10px;"></div>
+        </div>
 
-                <div id="group-optimizers" class="product-grid">
-                    <div class="product-card">
-                        <img src="https://i.imgur.com/8N69vT0.png" class="card-img" alt="PC Setup">
-                        <div class="card-info">
-                            <h3>V6 OPTIMIZER (ELITE)</h3>
-                            <p>High-tier registry and cache injection. Reduces latency by 15-30ms and stabilizes frame delivery for high-stakes competition.</p>
-                            <a href="YOUR_DOWNLOAD_LINK" class="btn">DOWNLOAD MODULE</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="group-cheats" class="product-grid" style="display:none;">
-                    <div class="product-card">
-                        <img src="https://i.imgur.com/LhB2uP8.png" class="card-img" alt="FPS Gameplay">
-                        <div class="card-info">
-                            <h3>KOUR.IO INTERNAL</h3>
-                            <p>Advanced weapon stabilization, frame-perfect ESP, and network-level silent aim injection.</p>
-                            <a href="YOUR_SCRIPT_LINK" class="btn btn-sec">INSTALL SCRIPT</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="community" class="tab-content">
-                <h1 style="font-family:'Orbitron'; margin-bottom:40px;">GLOBAL COMMS</h1>
-                <div class="chat-container">
-                    <div id="chat-msgs" class="chat-msgs"></div>
-                    <div style="display:flex; gap:15px;">
-                        <input type="text" id="msgInput" placeholder="Secure transmission..." style="margin:0;">
-                        <button class="btn" style="width:120px; margin:0;" onclick="sendGlobalMsg()">SEND</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="support" class="tab-content">
-                <h1 style="font-family:'Orbitron'; margin-bottom:40px;">SUPPORT PROTOCOL</h1>
-                <div style="max-width:600px;">
-                    <input type="text" id="t-sub" placeholder="Subject">
-                    <textarea id="t-msg" placeholder="Operational issue description..." style="height:150px;"></textarea>
-                    <button class="btn" onclick="submitTicket()">FILE TICKET</button>
-                </div>
-            </div>
-
-            <div id="owner" class="tab-content">
-                <h1 style="font-family:'Orbitron'; margin-bottom:40px; color:var(--secondary);">OWNER COMMAND</h1>
-                
-                <div class="product-grid">
-                    <div class="product-card card-info" style="padding:30px;">
-                        <h3>GLOBAL BROADCAST</h3>
-                        <input type="text" id="bc-msg" placeholder="Broadcast message...">
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn" style="background:var(--secondary); color:#fff;" onclick="setBroadcast()">SET ALERT</button>
-                            <button class="btn" style="background:#222; color:#fff;" onclick="clearBroadcast()">CLEAR</button>
-                        </div>
-                    </div>
-                    
-                    <div class="product-card card-info" style="padding:30px;">
-                        <h3>USER MANAGEMENT</h3>
-                        <div id="user-list"></div>
-                    </div>
-                </div>
-            </div>
-
+        <div id="support" class="tab-content">
+            <h2>SUPPORT TICKETS</h2>
+            <input type="text" placeholder="Subject">
+            <button class="btn" style="width:200px;">CREATE TICKET</button>
         </div>
     </div>
+</div>
 
-    <script>
-        // CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-tWfooosC689hzDUC4S5CXL7dJ3yANuc",
-            authDomain: "neuro-chat-8fe18.firebaseapp.com",
-            databaseURL: "https://neuro-chat-8fe18-default-rtdb.firebaseio.com",
-            projectId: "neuro-chat-8fe18",
-            storageBucket: "neuro-chat-8fe18.firebasestorage.app",
-            messagingSenderId: "490069277437",
-            appId: "1:490069277437:web:c17aaa860bf4ecfd7b1c94"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script>
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-tWfooosC689hzDUC4S5CXL7dJ3yANuc",
+        authDomain: "neuro-chat-8fe18.firebaseapp.com",
+        databaseURL: "https://neuro-chat-8fe18-default-rtdb.firebaseio.com",
+        projectId: "neuro-chat-8fe18",
+        storageBucket: "neuro-chat-8fe18.firebasestorage.app",
+        messagingSenderId: "490069277437",
+        appId: "1:490069277437:web:c17aaa860bf4ecfd7b1c94"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        let user = localStorage.getItem('nh_user') || "";
-        let isOwner = localStorage.getItem('nh_owner') === 'true';
-        let signUp = false;
-        const hwid = btoa(navigator.userAgent).substring(0, 12);
+    let currentUser = localStorage.getItem('neuroUser') || "";
+    let isSignUpMode = false;
 
-        // SYSTEM BOOT
-        window.onload = () => {
-            initStars();
-            listenForAlerts();
-            if(user) { validateSession(); }
-        };
-
-        function validateSession() {
-            db.ref('bans/users/' + user).once('value', s => {
-                if(s.exists()) { performLogout(); }
-                else { enterSystem(); }
-            });
-        }
-
-        function listenForAlerts() {
-            db.ref('site_settings/global_alert').on('value', snap => {
-                const b = document.getElementById('global-alert');
-                if(snap.val()) { b.innerText = snap.val(); b.style.display = 'block'; }
-                else { b.style.display = 'none'; }
-            });
-        }
-
-        // AUTHENTICATION LOGIC
-        function toggleAuth() {
-            signUp = !signUp;
-            document.getElementById('auth-header').innerText = signUp ? "NEURO REGISTER" : "NEURO LOGIN";
-            document.getElementById('auth-toggle').innerText = signUp ? "ALREADY REGISTERED? LOGIN" : "NEW AGENT? REGISTER";
-        }
-
-        async function processAuth() {
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim();
-            if(!u || !p) return;
-
-            // HWID Check
-            const ban = await db.ref('bans/ips/' + hwid).once('value');
-            if(ban.exists()) { alert("HARDWARE BLACKLISTED"); return; }
-
-            if(u === "neuro(owner)" && p === "admin") {
-                saveSession(u, true);
-                return;
-            }
-
-            const ref = db.ref('users/' + u);
-            const snap = await ref.once('value');
-
-            if(signUp) {
-                if(snap.exists()) alert("ID ALREADY TAKEN");
-                else { await ref.set({ p: p, hwid: hwid }); saveSession(u, false); }
-            } else {
-                if(snap.exists() && snap.val().p === p) saveSession(u, false);
-                else alert("INVALID ACCESS KEY");
-            }
-        }
-
-        function saveSession(u, owner) {
-            user = u; isOwner = owner;
-            localStorage.setItem('nh_user', u);
-            localStorage.setItem('nh_owner', owner);
-            enterSystem();
-        }
-
-        function enterSystem() {
+    // AUTO-LOGIN CHECK
+    window.onload = () => {
+        if(currentUser) {
             document.getElementById('auth-gate').style.display = 'none';
             document.getElementById('main-ui').style.display = 'grid';
-            if(user === "neuro(owner)") {
-                document.getElementById('owner-nav').style.display = 'flex';
-                loadUsers();
+        }
+    };
+
+    function handleAuth() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        if(!u || !p) return;
+
+        db.ref('users/' + u).once('value', snap => {
+            if(isSignUpMode) {
+                if(snap.exists()) alert("Username taken");
+                else {
+                    db.ref('users/' + u).set({ pass: p }).then(() => {
+                        login(u);
+                    });
+                }
+            } else {
+                if(snap.exists() && snap.val().pass === p) {
+                    login(u);
+                } else {
+                    alert("Invalid Login");
+                }
             }
-            startListeners();
+        });
+    }
+
+    function login(user) {
+        localStorage.setItem('neuroUser', user);
+        location.reload(); 
+    }
+
+    function logout() {
+        localStorage.clear();
+        location.reload();
+    }
+
+    function toggleAuthMode() {
+        isSignUpMode = !isSignUpMode;
+        document.getElementById('toggle-text').innerText = isSignUpMode ? "Already have an account? Login" : "Need an account? Sign Up";
+    }
+
+    function switchProductCategory(cat) {
+        document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+        if(cat === 'optimizers') {
+            document.getElementById('cat-optimizers').style.display = 'block';
+            document.getElementById('cat-cheats').style.display = 'none';
+            document.getElementById('st-opt').classList.add('active');
+        } else {
+            document.getElementById('cat-optimizers').style.display = 'none';
+            document.getElementById('cat-cheats').style.display = 'block';
+            document.getElementById('st-cht').classList.add('active');
         }
+    }
 
-        function performLogout() { localStorage.clear(); location.reload(); }
+    function showTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+    }
 
-        // NAVIGATION
-        function navTo(id, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        function setCategory(cat) {
-            document.getElementById('group-optimizers').style.display = cat === 'optimizers' ? 'grid' : 'none';
-            document.getElementById('group-cheats').style.display = cat === 'cheats' ? 'grid' : 'none';
-            document.getElementById('tab-opt').classList.toggle('active', cat === 'optimizers');
-            document.getElementById('tab-cht').classList.toggle('active', cat === 'cheats');
-        }
-
-        // DATABASE OPS
-        function startListeners() {
-            db.ref('messages').limitToLast(40).on('child_added', s => {
-                const m = s.val();
-                const box = document.getElementById('chat-msgs');
-                box.innerHTML += `<div><b>${m.u}:</b> ${m.t}</div>`;
-                box.scrollTop = box.scrollHeight;
-            });
-        }
-
-        function sendGlobalMsg() {
-            const t = document.getElementById('msgInput').value;
-            if(t) db.ref('messages').push({ u: user, t: t });
-            document.getElementById('msgInput').value = "";
-        }
-
-        function setBroadcast() {
-            const m = document.getElementById('bc-msg').value;
-            if(m) db.ref('site_settings/global_alert').set(m);
-        }
-
-        function clearBroadcast() { db.ref('site_settings/global_alert').remove(); }
-
-        function loadUsers() {
-            db.ref('users').on('value', s => {
-                const list = document.getElementById('user-list');
-                list.innerHTML = "";
-                s.forEach(u => {
-                    list.innerHTML += `<div class="user-row"><span>${u.key}</span><span style="opacity:0.4;">${u.val().hwid}</span></div>`;
-                });
-            });
-        }
-
-        // VISUALS
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            for(let i=0; i<150; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    v: Math.random() * 3 + 1,
-                    l: Math.random() * 20 + 5
-                });
-            }
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = isOwner ? "rgba(255,0,127,0.2)" : "rgba(0,242,255,0.2)";
-            ctx.lineWidth = 2;
-            stars.forEach(s => {
-                ctx.beginPath();
-                ctx.moveTo(s.x, s.y);
-                ctx.lineTo(s.x, s.y + s.l);
-                ctx.stroke();
-                s.y += s.v;
-                if(s.y > canvas.height) s.y = -20;
-            });
-            requestAnimationFrame(draw);
-        }
-        draw();
-        window.addEventListener('resize', initStars);
-
-    </script>
+    // Background FX
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function init() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        stars = [];
+        for(let i=0; i<80; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2+1});
+    }
+    function draw() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0, 242, 255, 0.3)";
+        stars.forEach(s => {
+            ctx.fillRect(s.x, s.y, 2, 10);
+            s.y += s.s;
+            if(s.y > canvas.height) s.y = -10;
+        });
+        requestAnimationFrame(draw);
+    }
+    init(); draw();
+</script>
 </body>
 </html>
