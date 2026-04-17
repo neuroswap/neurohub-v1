@@ -3,127 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEUROHUB | ELITE</title>
+    <title>NEUROHUB | Master Portal</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --primary: #00f2ff; --secondary: #ff007f; --bg: #010101; --panel: #080808; --border: rgba(255, 255, 255, 0.1); }
-        * { box-sizing: border-box; transition: 0.2s; }
+        :root { --primary: #00f2ff; --secondary: #ff007f; --bg: #010101; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
+        * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
         body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
-        
-        /* BAN SCREEN */
-        #ban-screen { position: fixed; inset: 0; background: #000; z-index: 99999; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        
-        /* AUTH SYSTEM */
+        #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
+        /* AUTH */
         #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: var(--panel); border: 2px solid var(--primary); padding: 40px; border-radius: 20px; width: 380px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.1); }
-        .auth-tabs { display: flex; margin-bottom: 25px; border-bottom: 1px solid var(--border); }
-        .auth-tab { flex: 1; padding: 10px; cursor: pointer; font-family: 'Orbitron'; color: #555; font-size: 0.8rem; }
-        .auth-tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .auth-box { background: #080808; border: 2px solid var(--primary); padding: 40px; border-radius: 25px; width: 400px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); }
+        input, textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 14px; color: white; border-radius: 12px; margin-bottom: 12px; outline: none; font-family: 'Inter'; }
         
-        input { width: 100%; background: #111; border: 1px solid var(--border); padding: 14px; color: #fff; margin: 10px 0; border-radius: 8px; outline: none; }
-        input:focus { border-color: var(--primary); }
+        /* TOS */
+        #tos-gate { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10001; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .tos-box { background: #080808; border: 1px solid var(--border); padding: 30px; border-radius: 20px; width: 450px; text-align: center; }
 
-        /* DASHBOARD UI */
+        /* UI LAYOUT */
         #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
-        .sidebar { background: #050505; border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; }
-        .nav-tab { padding: 18px; margin: 5px 0; cursor: pointer; font-family: 'Orbitron'; font-size: 0.85rem; color: #666; border-radius: 10px; }
-        .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.05); border-left: 4px solid var(--primary); }
+        .sidebar { background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+        .nav-tab { padding: 16px; border-radius: 15px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 12px; }
+        .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.08); border: 1px solid var(--primary); }
 
-        .content { padding: 60px; overflow-y: auto; background: radial-gradient(circle at top right, #0a0a0a, #010101); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .panel { background: var(--panel); border: 1px solid var(--border); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* CONTENT */
+        .content-area { padding: 50px; overflow-y: auto; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease forwards; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .panel { background: var(--glass); border: 1px solid var(--border); border-radius: 24px; padding: 30px; margin-bottom: 25px; }
         
-        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); color: #000; text-decoration: none; text-align: center; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; margin-top: 20px; cursor: pointer; border: none; font-size: 0.9rem; }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        /* BUTTONS */
+        .btn { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 12px 25px; border-radius: 50px; border: none; cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; text-align: center; }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--primary); }
+        .btn-admin { background: var(--secondary); color: white; width: 100%; margin-top: 5px; font-size: 0.7rem; border-radius: 10px; }
+
+        /* CHAT */
+        .chat-box { height: 300px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 10px; font-size: 0.85rem; }
+        
+        #logout-btn { position: absolute; bottom: 20px; left: 20px; font-size: 0.6rem; color: var(--secondary); background: none; border: 1px solid var(--secondary); padding: 5px 10px; cursor: pointer; font-family: 'Orbitron'; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="ban-screen">
-        <h1 style="font-family:'Orbitron'; color:var(--secondary); letter-spacing: 5px;">USER BANNED</h1>
-        <p style="color: #444;">Access Denied by System Administrator</p>
+<canvas id="starfield"></canvas>
+
+<div id="auth-gate">
+    <div class="auth-box">
+        <h2 id="auth-title" style="font-family: 'Orbitron'; color: var(--primary);">NEURO LOGIN</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn" style="width:100%" onclick="handleAuth()">AUTHORIZE</button>
+        <p id="toggle-text" onclick="toggleAuthMode()" style="color:var(--primary); cursor:pointer; font-size:0.7rem; margin-top:15px; opacity:0.6;">Need an account? Sign Up</p>
+    </div>
+</div>
+
+<div id="tos-gate">
+    <div class="tos-box">
+        <h2 style="font-family:'Orbitron'; color:var(--primary);">TERMS</h2>
+        <p style="font-size:0.8rem; color:#888;">No reverse engineering. No chat abuse. Bans are permanent IP/Device locks.</p>
+        <button class="btn" style="width:100%" onclick="finishLogin()">ACCEPT & ENTER</button>
+    </div>
+</div>
+
+<div id="main-ui">
+    <div class="sidebar">
+        <h2 style="font-family:'Orbitron'; color:var(--primary); text-align:center;">NEUROHUB</h2>
+        <div class="nav-tab active" onclick="showTab('products', this)">PRODUCTS</div>
+        <div class="nav-tab" onclick="showTab('chat', this)">COMMUNITY</div>
+        <div class="nav-tab" onclick="showTab('support', this)">SUPPORT</div>
+        <div id="admin-tab" class="nav-tab" style="display:none; color:var(--secondary);" onclick="showTab('admin', this)">OWNER PANEL</div>
+        <button id="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
 
-    <div id="auth-gate">
-        <div class="auth-box">
-            <h1 style="font-family:'Orbitron'; color:var(--primary); margin-bottom: 30px;">NEUROHUB</h1>
-            <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">LOGIN</div>
-                <div class="auth-tab" id="tab-signup" onclick="switchAuth('signup')">SIGN UP</div>
-            </div>
-            <input type="text" id="user" placeholder="Username">
-            <input type="password" id="pass" placeholder="Password">
-            <button id="auth-btn" onclick="handleAuth()" class="btn">PROCEED</button>
-        </div>
-    </div>
-
-    <div id="main-ui">
-        <div class="sidebar">
-            <h2 style="font-family:'Orbitron'; color:var(--primary); margin-bottom:50px; text-align: center;">NEUROHUB</h2>
-            <div class="nav-tab active">PRODUCTS</div>
-            <div class="nav-tab">COMMUNITY</div>
-            <div class="nav-tab">SUPPORT</div>
-            <div style="margin-top:auto;" class="nav-tab" onclick="location.reload()">LOGOUT</div>
-        </div>
-
-        <div class="content">
-            <h1 style="font-family:'Orbitron'; font-size: 2rem; margin-bottom:40px; border-bottom: 2px solid var(--primary); display: inline-block;">DASHBOARD</h1>
-            <div class="grid">
+    <div class="content-area">
+        <div id="products" class="tab-content active">
+            <h1 style="font-family:'Orbitron';">MODULES</h1>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                 <div class="panel">
-                    <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0;">V6 OPTIMIZER</h2>
-                    <p style="color:#777; font-size:0.85rem; margin-top:15px; line-height: 1.6;">Stand-alone PC Utility. Cleans cache and reduces latency for elite performance.</p>
-                    <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494771426979221694/NeuroHub_V6_Elite.exe?ex=69e3d1df&is=69e2805f&hm=30b33810ca8741e2100c22616c82dec4008a9d07821cc1f0b088c9bc461058eb&" class="btn">DOWNLOAD EXE</a>
+                    <h3>V6 OPTIMIZER</h3>
+                    <p style="font-size:0.8rem; color:#888;">Elite PC Utility. Cleans cache and reduces latency.</p>
+                    <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494771426979221694/NeuroHub_V6_Elite.exe?ex=69e3d1df&is=69e2805f&hm=30b33810ca8741e2100c22616c82dec4008a9d07821cc1f0b088c9bc461058eb&" class="btn">DOWNLOAD</a>
                 </div>
-
                 <div class="panel">
-                    <h2 style="font-family:'Orbitron'; color:var(--secondary); margin:0;">kour.io cheat</h2>
-                    <p style="color:#777; font-size:0.85rem; margin-top:15px; line-height: 1.6;">aimbot esp crosshair</p>
-                    <a href="#" class="btn" style="background:var(--secondary);">INSTALL SCRIPT</a>
+                    <h3>kour.io cheat</h3>
+                    <p style="font-size:0.8rem; color:#888;">aimbot esp crosshair</p>
+                    <a href="https://raw.githubusercontent.com/neuroswap/ddos/main/kour-internal.user.js" class="btn" style="background:var(--secondary); color:white;">INSTALL</a>
                 </div>
             </div>
         </div>
+
+        <div id="chat" class="tab-content">
+            <h2>GLOBAL CHAT</h2>
+            <div id="chat-display" class="chat-box"></div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="chatInput" placeholder="Message..." style="margin:0;">
+                <button class="btn" onclick="sendMsg()">SEND</button>
+            </div>
+        </div>
+
+        <div id="support" class="tab-content">
+            <h2>SUPPORT</h2>
+            <div class="panel">
+                <input type="text" id="t-subject" placeholder="Subject">
+                <textarea id="t-body" placeholder="Describe issue..."></textarea>
+                <button class="btn" onclick="fileTicket()">OPEN TICKET</button>
+            </div>
+            <div id="user-tickets"></div>
+            <div id="ticket-chat-area" style="display:none;" class="panel">
+                <h4 id="active-ticket-id">Ticket Chat</h4>
+                <div id="t-chat-display" class="chat-box"></div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="t-chat-input" placeholder="Reply..." style="margin:0;">
+                    <button class="btn" onclick="sendTicketMsg()">REPLY</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin" class="tab-content">
+            <h2>OWNER COMMANDS</h2>
+            <div class="panel">
+                <h3>BAN SYSTEM</h3>
+                <input type="text" id="ban-target" placeholder="Username to Ban">
+                <button class="btn btn-admin" onclick="banUser()">BAN USER & IP</button>
+            </div>
+            <div class="panel">
+                <h3>ALL TICKETS</h3>
+                <div id="admin-all-tickets"></div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <script>
-        const firebaseConfig = { databaseURL: "https://neuro-chat-8fe18-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-tWfooosC689hzDUC4S5CXL7dJ3yANuc",
+        authDomain: "neuro-chat-8fe18.firebaseapp.com",
+        databaseURL: "https://neuro-chat-8fe18-default-rtdb.firebaseio.com",
+        projectId: "neuro-chat-8fe18",
+        storageBucket: "neuro-chat-8fe18.firebasestorage.app",
+        messagingSenderId: "490069277437",
+        appId: "1:490069277437:web:c17aaa860bf4ecfd7b1c94"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        let authMode = 'login';
+    let currentUser = localStorage.getItem('neuroUser') || "";
+    let isOwner = localStorage.getItem('neuroIsOwner') === 'true';
+    let isSignUpMode = false;
+    let currentTicketId = "";
+    const fingerprint = btoa(navigator.userAgent).substring(0, 16);
 
-        function switchAuth(mode) {
-            authMode = mode;
-            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-            document.getElementById('auth-btn').innerText = mode === 'login' ? 'LOGIN' : 'SIGN UP';
+    window.onload = () => { if(currentUser) checkBanAndLogin(); };
+
+    function toggleAuthMode() {
+        isSignUpMode = !isSignUpMode;
+        document.getElementById('auth-title').innerText = isSignUpMode ? "NEURO SIGN UP" : "NEURO LOGIN";
+        document.getElementById('toggle-text').innerText = isSignUpMode ? "Already have an account? Login" : "Need an account? Sign Up";
+    }
+
+    async function handleAuth() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        if(!u || !p) return;
+
+        const deviceBan = await db.ref('bans/ips/' + fingerprint).once('value');
+        if(deviceBan.exists()) { alert("DEVICE BANNED"); return; }
+
+        if(u === "neuro(owner)" && p === "admin") { loginSuccess(u, true); return; }
+
+        const userRef = db.ref('users/' + u);
+        const snap = await userRef.once('value');
+
+        if(isSignUpMode) {
+            if(snap.exists()) alert("Username taken!");
+            else { await userRef.set({ pass: p, fp: fingerprint }); loginSuccess(u, false); }
+        } else {
+            if(snap.exists() && snap.val().pass === p) loginSuccess(u, false);
+            else alert("Invalid credentials!");
         }
+    }
 
-        function handleAuth() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
+    function loginSuccess(u, owner) {
+        currentUser = u; isOwner = owner;
+        localStorage.setItem('neuroUser', u);
+        localStorage.setItem('neuroIsOwner', owner);
+        document.getElementById('auth-gate').style.display = 'none';
+        document.getElementById('tos-gate').style.display = 'flex';
+    }
 
-            if(!u || !p) return alert("Fill all fields");
+    function finishLogin() {
+        document.getElementById('tos-gate').style.display = 'none';
+        document.getElementById('main-ui').style.display = 'grid';
+        if(isOwner) document.getElementById('admin-tab').style.display = 'flex';
+        initHub();
+    }
 
-            if(authMode === 'login') {
-                db.ref('bans/' + u).once('value', snapshot => {
-                    if(snapshot.exists()) {
-                        document.getElementById('ban-screen').style.display = 'flex';
-                    } else if(u === "neuro" && p === "owner") {
-                        document.getElementById('auth-gate').style.display = 'none';
-                        document.getElementById('main-ui').style.display = 'grid';
-                    } else {
-                        alert("Access Denied");
-                    }
-                });
-            } else {
-                // Simplified Signup for Testing
-                alert("Account created for " + u + ". Use Login now.");
-                switchAuth('login');
+    async function checkBanAndLogin() {
+        const ban = await db.ref('bans/users/' + currentUser).once('value');
+        const ipBan = await db.ref('bans/ips/' + fingerprint).once('value');
+        if(ban.exists() || ipBan.exists()) { logout(); }
+        else finishLogin();
+    }
+
+    function logout() { localStorage.clear(); location.reload(); }
+
+    function showTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function initHub() {
+        db.ref('messages').limitToLast(30).on('child_added', s => {
+            const d = s.val();
+            const box = document.getElementById('chat-display');
+            box.innerHTML += `<div><b style="color:var(--primary)">${d.user}:</b> ${d.text}</div>`;
+            box.scrollTop = box.scrollHeight;
+        });
+
+        db.ref('tickets').on('value', s => {
+            const uDiv = document.getElementById('user-tickets');
+            const aDiv = document.getElementById('admin-all-tickets');
+            uDiv.innerHTML = ""; aDiv.innerHTML = "";
+            s.forEach(c => {
+                const t = c.val(), k = c.key;
+                const html = `<div style="padding:10px; border-bottom:1px solid #222;"><b>${t.sub}</b> <button class="btn" style="padding:4px 10px; margin-left:10px" onclick="openTicketChat('${k}')">JOIN</button> ${isOwner ? `<button class="btn" style="background:red; padding:4px 10px" onclick="deleteTicket('${k}')">DEL</button>` : ''}</div>`;
+                if(isOwner) aDiv.innerHTML += html;
+                if(t.user === currentUser) uDiv.innerHTML += html;
+            });
+        });
+    }
+
+    function openTicketChat(id) {
+        currentTicketId = id;
+        document.getElementById('ticket-chat-area').style.display = 'block';
+        db.ref('ticket_msgs/' + id).on('value', s => {
+            const box = document.getElementById('t-chat-display');
+            box.innerHTML = "";
+            s.forEach(m => { box.innerHTML += `<div><b>${m.val().user}:</b> ${m.val().text}</div>`; });
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    function sendTicketMsg() {
+        const val = document.getElementById('t-chat-input').value;
+        if(val) db.ref('ticket_msgs/' + currentTicketId).push({ user: currentUser, text: val });
+        document.getElementById('t-chat-input').value = "";
+    }
+
+    function sendMsg() { 
+        const t = document.getElementById('chatInput').value;
+        if(t) db.ref('messages').push({user: currentUser, text: t});
+        document.getElementById('chatInput').value = "";
+    }
+
+    function fileTicket() {
+        const s = document.getElementById('t-subject').value, b = document.getElementById('t-body').value;
+        if(s && b) db.ref('tickets').push({user: currentUser, sub: s, body: b});
+    }
+
+    function banUser() {
+        const target = document.getElementById('ban-target').value;
+        if(!target) return;
+        db.ref('users/' + target).once('value', s => {
+            if(s.exists()) {
+                db.ref('bans/users/' + target).set(true);
+                if(s.val().fp) db.ref('bans/ips/' + s.val().fp).set(true);
+                alert("Banned " + target);
             }
-        }
-    </script>
+        });
+    }
+
+    function deleteTicket(id) { db.ref('tickets/' + id).remove(); db.ref('ticket_msgs/' + id).remove(); }
+
+    // Background Stars
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function initStars() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        stars = [];
+        for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*5+2, l:Math.random()*15+5});
+    }
+    function draw() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.strokeStyle = isOwner ? "#ff007f33" : "#00f2ff33";
+        stars.forEach(s => {
+            ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x, s.y+s.l); ctx.stroke();
+            s.y += s.s; if(s.y > canvas.height) s.y = -20;
+        });
+        requestAnimationFrame(draw);
+    }
+    initStars(); draw();
+    window.addEventListener('resize', initStars);
+</script>
 </body>
 </html>
