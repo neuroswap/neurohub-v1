@@ -3,221 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEUROHUB | Elite Portal</title>
+    <title>NEUROHUB | Master Portal</title>
+    
     <link rel="icon" href="https://img.icons8.com/ios-filled/50/00f2ff/skull.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --primary: #00f2ff;
-            --secondary: #ff007f;
-            --bg-dark: #050505;
-            --panel-bg: rgba(13, 17, 23, 0.98);
-            --border: rgba(0, 242, 255, 0.3);
+        :root { 
+            --primary: #00f2ff; 
+            --secondary: #ff007f; 
+            --bg: #010101; 
+            --glass: rgba(255, 255, 255, 0.03); 
+            --border: rgba(0, 242, 255, 0.2); 
         }
 
-        * { cursor: crosshair !important; box-sizing: border-box; transition: 0.2s; }
-        body, html { margin: 0; padding: 0; background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
+        /* CUSTOM CROSSHAIR CURSOR */
+        * { cursor: crosshair !important; box-sizing: border-box; transition: all 0.2s ease-in-out; }
 
-        canvas#stars { position: fixed; inset: 0; z-index: -1; background: #000; }
-
-        /* ALERT SYSTEM */
-        #broadcast-bar {
-            background: rgba(255, 0, 127, 0.2);
-            border-bottom: 1px solid var(--secondary);
-            color: var(--secondary);
-            text-align: center;
-            padding: 8px;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            display: none;
-            letter-spacing: 2px;
-        }
-
-        /* UI STRUCTURE */
-        .wrapper { display: none; height: 100vh; flex-direction: column; }
-        .top-nav { height: 60px; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
-        .main-body { display: flex; flex: 1; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         
-        .sidebar { width: 250px; background: rgba(5,5,5,0.95); border-right: 1px solid var(--border); padding: 25px 15px; display: flex; flex-direction: column; gap: 8px; }
-        .nav-item { padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 0.75rem; color: #555; display: flex; align-items: center; gap: 12px; }
-        .nav-item:hover, .nav-item.active { color: var(--primary); background: rgba(0, 242, 255, 0.05); }
+        #starfield { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: #000; }
 
-        .content { flex: 1; padding: 40px; overflow-y: auto; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        #global-alert { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; 
+            background: var(--secondary); color: white; padding: 12px; 
+            text-align: center; font-family: 'Orbitron'; font-size: 0.8rem; 
+            z-index: 20000; box-shadow: 0 5px 20px rgba(255, 0, 127, 0.5); 
+            border-bottom: 2px solid white; letter-spacing: 2px;
+        }
 
-        /* OWNER TOOLS */
-        #owner-nav { margin-top: auto; border-top: 1px solid #222; padding-top: 15px; display: none; color: var(--secondary) !important; }
-        .admin-card { background: #111; border: 1px solid var(--secondary); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        /* AUTH BOX */
+        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { 
+            background: #080808; border: 2px solid var(--primary); padding: 45px; 
+            border-radius: 25px; width: 420px; text-align: center; 
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.15);
+        }
+        input, textarea { 
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
+            padding: 15px; color: white; border-radius: 12px; margin-bottom: 15px; outline: none; 
+        }
+        input:focus { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
 
-        /* BUTTONS */
+        #main-ui { display: none; height: 100vh; grid-template-columns: 280px 1fr; }
+        
+        .sidebar { 
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); 
+            border-right: 1px solid var(--border); padding: 40px 20px; 
+            display: flex; flex-direction: column; gap: 10px; position: relative; 
+        }
+        .nav-tab { 
+            padding: 16px; border-radius: 15px; cursor: pointer; font-family: 'Orbitron'; 
+            font-size: 0.75rem; color: #555; display: flex; align-items: center; gap: 12px; 
+        }
+        .nav-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-tab.active { color: var(--primary); background: rgba(0, 242, 255, 0.1); border: 1px solid var(--primary); }
+
+        .content-area { padding: 50px; overflow-y: auto; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease forwards; }
+        .tab-content.active { display: block; }
+        
+        .panel { background: var(--glass); border: 1px solid var(--border); border-radius: 24px; padding: 30px; margin-bottom: 25px; }
+
         .btn { 
-            background: transparent; border: 1px solid var(--primary); color: var(--primary); 
-            padding: 12px; border-radius: 6px; font-family: 'Orbitron'; width: 100%; 
-            display: block; text-align: center; text-decoration: none; margin-top: 10px;
+            background: var(--primary); color: #000; font-family: 'Orbitron'; 
+            font-weight: 900; padding: 14px 30px; border-radius: 10px; border: none; 
+            cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; 
+            text-align: center;
         }
-        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); transform: scale(1.02); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 20px var(--primary); }
 
-        /* AUTH GATE */
-        #auth-gate { position: fixed; inset: 0; z-index: 10000; background: #000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: var(--panel-bg); border: 2px solid var(--primary); padding: 45px; border-radius: 15px; width: 400px; text-align: center; }
-        input { width: 100%; background: #0a0a0a; border: 1px solid var(--border); padding: 14px; color: #fff; margin-bottom: 12px; border-radius: 8px; outline: none; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .chat-box { 
+            height: 350px; overflow-y: auto; background: rgba(0,0,0,0.5); 
+            padding: 20px; border-radius: 15px; border: 1px solid var(--border); 
+            margin-bottom: 15px; font-size: 0.85rem; 
+        }
+
+        #logout-btn { 
+            position: absolute; bottom: 25px; left: 20px; font-size: 0.65rem; 
+            color: var(--secondary); background: none; border: 1px solid var(--secondary); 
+            padding: 8px 15px; cursor: pointer; font-family: 'Orbitron'; border-radius: 8px; 
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<canvas id="stars"></canvas>
-<div id="broadcast-bar">SYSTEM ALERT: AUTO-INJECTION READY</div>
+<div id="global-alert"></div>
+<canvas id="starfield"></canvas>
 
 <div id="auth-gate">
     <div class="auth-box">
-        <h2 style="font-family:'Orbitron'; color:var(--primary); letter-spacing:4px;">NEUROHUB</h2>
-        <input type="text" id="user" placeholder="USERNAME">
-        <input type="password" id="pass" placeholder="PASSWORD">
-        <button class="btn" onclick="login()">AUTHORIZE IDENTITY</button>
-        <p style="font-size:0.6rem; color:#333; margin-top:15px; cursor:pointer;" onclick="toggleReg()">OR REGISTER NEW ACCOUNT</p>
+        <h2 id="auth-title" style="font-family: 'Orbitron'; color: var(--primary); letter-spacing: 3px;">NEURO LOGIN</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn" style="width:100%" onclick="handleAuth()">AUTHORIZE</button>
+        <p id="toggle-text" onclick="toggleAuthMode()" style="color:var(--primary); cursor:pointer; font-size:0.7rem; margin-top:20px; opacity:0.6;">Need an account? Sign Up</p>
     </div>
 </div>
 
-<div class="wrapper" id="main">
-    <nav class="top-nav">
-        <div style="font-family:'Orbitron'; color:var(--primary); letter-spacing:2px; display:flex; align-items:center; gap:10px;">
-            <img src="https://img.icons8.com/ios-filled/50/00f2ff/skull.png" width="20"> NEUROHUB ELITE
+<div id="main-ui">
+    <div class="sidebar">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:40px; justify-content:center;">
+            <img src="https://img.icons8.com/ios-filled/50/00f2ff/skull.png" width="22">
+            <h2 style="font-family:'Orbitron'; color:var(--primary); margin:0; font-size:1.2rem;">NEUROHUB</h2>
         </div>
-        <div id="tag" style="font-size:0.75rem; color:#666;">AGENT: NULL</div>
-    </nav>
+        
+        <div class="nav-tab active" onclick="showTab('products', this)">PRODUCTS</div>
+        <div class="nav-tab" onclick="showTab('chat', this)">COMMUNITY</div>
+        <div class="nav-tab" onclick="showTab('support', this)">SUPPORT</div>
+        
+        <div id="admin-tab" class="nav-tab" style="display:none; color:var(--secondary); border-color:var(--secondary);" onclick="showTab('admin', this)">💎 OWNER PANEL</div>
+        
+        <button id="logout-btn" onclick="logout()">LOGOUT</button>
+    </div>
 
-    <div class="main-body">
-        <aside class="sidebar">
-            <div class="nav-item active" onclick="tab('dash', this)">🏠 Dashboard</div>
-            <div class="nav-item" onclick="tab('store', this)">🛒 Product Store</div>
-            <div class="nav-item" onclick="tab('events', this)">📅 Events</div>
-            
-            <div id="owner-nav" class="nav-item" onclick="tab('admin', this)">💎 OWNER PANEL</div>
-            
-            <div class="nav-item" style="margin-top:auto" onclick="location.reload()">🚪 Terminate</div>
-        </aside>
-
-        <main class="content">
-            <div id="dash" class="tab-content active">
-                <h1 style="font-family:'Orbitron'; font-size:3.5rem; text-align:center; margin-top:20vh; color:var(--primary);">WELCOME TO NEUROCHEATS!</h1>
+    <div class="content-area">
+        <div id="products" class="tab-content active">
+            <h1 style="font-family:'Orbitron';">MODULES</h1>
+            <div class="panel">
+                <h3 style="color: var(--primary);">V6 OPTIMIZER (ELITE)</h3>
+                <p style="font-size:0.85rem; color:#888; line-height: 1.6;">PC System Optimization & Frame Rate Unlocker.</p>
+                <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494771426979221694/NeuroHub_V6_Elite.exe?ex=69e3d1df&is=69e2805f&hm=30b33810ca8741e2100c22616c82dec4008a9d07821cc1f0b088c9bc461058eb" class="btn">DOWNLOAD EXE</a>
             </div>
-
-            <div id="store" class="tab-content">
-                <h2 style="font-family:'Orbitron'; border-bottom:1px solid var(--border); padding-bottom:10px;">PUBLIC STORE</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                    <div class="admin-card" style="border-color:var(--primary)">
-                        <h3>V6 OPTIMIZER</h3>
-                        <p>Total PC System Optimization & FPS Unlocker.</p>
-                        <a href="https://neurohub-v1.netlify.app/downloads/NeuroHubElite.exe" class="btn">DOWNLOAD EXE</a>
-                    </div>
-                    <div class="admin-card" style="border-color:var(--primary)">
-                        <h3>KOUR.IO SCRIPT</h3>
-                        <p>Silent Aimbot, ESP, and Radar Integration.</p>
-                        <button class="btn" onclick="installScript()">INSTALL SCRIPT</button>
-                    </div>
-                </div>
+            <div class="panel">
+                <h3 style="color: var(--secondary);">KOUR.IO INTERNAL</h3>
+                <p style="font-size:0.85rem; color:#888; line-height: 1.6;">Silent Aimbot & Advanced ESP Suite.</p>
+                <a href="https://raw.githubusercontent.com/neuroswap/ddos/main/kour-internal.user.js" class="btn" style="background:var(--secondary); color:white;">INSTALL SCRIPT</a>
             </div>
+        </div>
 
-            <div id="events" class="tab-content">
-                <h2 style="font-family:'Orbitron';">UPCOMING RELEASES</h2>
-                <p>🚀 KRUNKER.IO PRODUCT - <span style="color:var(--primary)">4/19/26</span></p>
-                <p>🔥 CS2 PRODUCT - <span style="color:var(--primary)">4/29/26</span></p>
+        <div id="chat" class="tab-content">
+            <h2 style="font-family:'Orbitron'; color:var(--primary);">GLOBAL CHAT</h2>
+            <div id="chat-display" class="chat-box"></div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="chatInput" placeholder="Message..." style="margin:0;">
+                <button class="btn" onclick="sendMsg()">SEND</button>
             </div>
+        </div>
 
-            <div id="admin" class="tab-content">
-                <h2 style="font-family:'Orbitron'; color:var(--secondary);">ADMIN OVERRIDE</h2>
-                
-                <div class="admin-card">
-                    <h4>BROADCAST ALERT</h4>
-                    <input type="text" id="alert-msg" placeholder="Enter custom message...">
-                    <button class="btn" style="border-color:var(--secondary); color:var(--secondary)" onclick="sendAlert()">SEND ALERT</button>
-                </div>
-
-                <div class="admin-card">
-                    <h4>BAN SYSTEM (HWID/IP)</h4>
-                    <input type="text" id="ban-user" placeholder="Target Username">
-                    <button class="btn" style="border-color:#ff0000; color:#ff0000" onclick="banUser()">EXECUTE BAN</button>
-                </div>
-
-                <div class="admin-card">
-                    <h4>USER LIST</h4>
-                    <ul id="user-list" style="font-size:0.8rem; color:#888; list-style:none; padding:0;">
-                        <li>ZAYDEN [OWNER] - 127.0.0.1</li>
-                        <li>Guest_9921 - 192.168.1.5</li>
-                    </ul>
-                </div>
+        <div id="admin" class="tab-content">
+            <h2 style="font-family:'Orbitron'; color: var(--secondary);">OWNER PANEL</h2>
+            <div class="panel">
+                <h3>GLOBAL BROADCAST</h3>
+                <input type="text" id="alert-msg" placeholder="Broadcast message...">
+                <button class="btn" style="background:var(--secondary); color:white; width:100%" onclick="updateGlobalAlert()">SET ALERT</button>
             </div>
-        </main>
+            <div class="panel">
+                <h3>REGISTERED AGENTS</h3>
+                <div id="user-list-container" style="max-height:200px; overflow:auto; font-size:0.8rem; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;"></div>
+            </div>
+            <div class="panel">
+                <h3>BAN PROTOCOL</h3>
+                <input type="text" id="ban-target" placeholder="Username to ban">
+                <button class="btn" style="background:red; color:white; width:100%" onclick="banUser()">PERMANENT BAN</button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    // STARS
-    const canvas = document.getElementById('stars');
+    // FIREBASE SETUP
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-tWfooosC689hzDUC4S5CXL7dJ3yANuc",
+        authDomain: "neuro-chat-8fe18.firebaseapp.com",
+        databaseURL: "https://neuro-chat-8fe18-default-rtdb.firebaseio.com",
+        projectId: "neuro-chat-8fe18",
+        storageBucket: "neuro-chat-8fe18.firebasestorage.app",
+        messagingSenderId: "490069277437",
+        appId: "1:490069277437:web:c17aaa860bf4ecfd7b1c94"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let currentUser = localStorage.getItem('neuroUser') || "";
+    const fingerprint = btoa(navigator.userAgent).substring(0, 16);
+
+    // STAR ANIMATION (NEON FALLING STARS)
+    const canvas = document.getElementById('starfield');
     const ctx = canvas.getContext('2d');
     let stars = [];
-    function init() {
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+    function initStars() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         stars = [];
-        for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2, v:Math.random()*4+2});
-    }
-    function draw() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle="#fff";
-        stars.forEach(s => {
-            ctx.beginPath(); ctx.arc(s.x, s.y, s.s/2, 0, Math.PI*2); ctx.fill();
-            s.y += s.v; if(s.y > canvas.height) s.y = -10;
-        });
-        requestAnimationFrame(draw);
-    }
-
-    // AUTH & OWNER CHECK
-    function login() {
-        const u = document.getElementById('user').value.toLowerCase();
-        const p = document.getElementById('pass').value;
-
-        if(u === "zayden" && p === "admin") {
-            document.getElementById('owner-nav').style.display = "flex";
-            document.getElementById('tag').innerText = "OWNER: ZAYDEN";
-        } else {
-            document.getElementById('tag').innerText = "AGENT: " + u.toUpperCase();
+        for(let i=0; i<80; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                length: Math.random() * 20 + 10,
+                speed: Math.random() * 10 + 5,
+                opacity: Math.random()
+            });
         }
-        
-        document.getElementById('auth-gate').style.display = "none";
-        document.getElementById('main').style.display = "flex";
     }
 
-    // FUNCTIONALITY
-    function tab(id, el) {
+    function drawStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 2;
+        stars.forEach(s => {
+            let gradient = ctx.createLinearGradient(s.x, s.y, s.x, s.y + s.length);
+            gradient.addColorStop(0, "transparent");
+            gradient.addColorStop(1, localStorage.getItem('neuroIsOwner') === 'true' ? "#ff007f" : "#00f2ff");
+            
+            ctx.strokeStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(s.x, s.y);
+            ctx.lineTo(s.x, s.y + s.length);
+            ctx.stroke();
+            
+            s.y += s.speed;
+            if(s.y > canvas.height) {
+                s.y = -s.length;
+                s.x = Math.random() * canvas.width;
+            }
+        });
+        requestAnimationFrame(drawStars);
+    }
+
+    // AUTH LOGIC
+    async function handleAuth() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        if(!u || !p) return;
+
+        // OWNER BYPASS
+        if(u === "neuro(owner)" && p === "admin") {
+            loginSuccess(u, true);
+            return;
+        }
+
+        const userRef = db.ref('users/' + u);
+        const snap = await userRef.once('value');
+        if(snap.exists() && snap.val().pass === p) {
+            loginSuccess(u, false);
+        } else {
+            alert("CREDENTIALS REJECTED");
+        }
+    }
+
+    function loginSuccess(u, owner) {
+        localStorage.setItem('neuroUser', u);
+        localStorage.setItem('neuroIsOwner', owner);
+        location.reload(); 
+    }
+
+    function logout() {
+        localStorage.clear();
+        location.reload();
+    }
+
+    // TAB SYSTEM
+    function showTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
     }
 
-    function sendAlert() {
+    // GLOBAL CHAT
+    function sendMsg() {
+        const t = document.getElementById('chatInput').value;
+        if(t) db.ref('messages').push({user: localStorage.getItem('neuroUser'), text: t});
+        document.getElementById('chatInput').value = "";
+    }
+
+    // INITIALIZE SITE
+    window.onload = () => {
+        if(localStorage.getItem('neuroUser')) {
+            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'grid';
+            if(localStorage.getItem('neuroIsOwner') === 'true') {
+                document.getElementById('admin-tab').style.display = 'flex';
+                loadAdminTools();
+            }
+            
+            db.ref('messages').limitToLast(20).on('child_added', s => {
+                const d = s.val();
+                const box = document.getElementById('chat-display');
+                box.innerHTML += `<div><b style="color:var(--primary)">${d.user}:</b> ${d.text}</div>`;
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+        initStars(); drawStars();
+    };
+
+    function loadAdminTools() {
+        db.ref('users').on('value', snap => {
+            const container = document.getElementById('user-list-container');
+            container.innerHTML = "";
+            snap.forEach(user => {
+                container.innerHTML += `<div style="padding:5px; border-bottom:1px solid #222;">${user.key}</div>`;
+            });
+        });
+    }
+
+    function updateGlobalAlert() {
         const msg = document.getElementById('alert-msg').value;
-        const bar = document.getElementById('broadcast-bar');
-        bar.innerText = "OWNER BROADCAST: " + msg.toUpperCase();
-        bar.style.display = "block";
+        db.ref('site_settings/global_alert').set(msg);
     }
 
-    function banUser() {
-        const user = document.getElementById('ban-user').value;
-        alert("Banning User: " + user + " (HWID & IP LOGGED)");
-    }
+    db.ref('site_settings/global_alert').on('value', snap => {
+        const banner = document.getElementById('global-alert');
+        if(snap.val()) {
+            banner.innerText = snap.val();
+            banner.style.display = 'block';
+        } else {
+            banner.style.display = 'none';
+        }
+    });
 
-    function installScript() {
-        alert("Downloading Kour.io Script protocol...");
-        window.location.href = "https://neurohub-v1.netlify.app/scripts/kour-main.js";
-    }
-
-    init(); draw();
-    window.onresize = init;
+    window.addEventListener('resize', initStars);
 </script>
 </body>
 </html>
