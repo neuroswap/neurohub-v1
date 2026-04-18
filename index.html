@@ -34,6 +34,9 @@
         .btn { background: var(--primary); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.7rem; width: 100%; text-align: center; text-decoration: none; display: block; margin-top: 10px; letter-spacing: 1px; }
         .btn-discord { background: #5865F2; color: white; border-bottom: 3px solid #3b448b; }
         .btn-secondary { background: var(--secondary); color: white; }
+        
+        input, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: white; border-radius: 5px; margin-top: 10px; font-family: 'Inter'; }
+        
         .version-tag { position: fixed; bottom: 20px; right: 20px; font-family: 'Orbitron'; font-size: 0.6rem; color: #333; letter-spacing: 2px; }
 
         .user-pill { margin-top: auto; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
@@ -60,10 +63,10 @@
 <div id="main-ui">
     <div class="sidebar">
         <h2 style="font-family:'Orbitron'; color:var(--primary); text-align:center; font-size:1rem; margin-bottom:30px;">NEUROHUB</h2>
-        
         <div class="nav-tab active" onclick="showTab('dash', this)">DASHBOARD</div>
         <div class="nav-tab" onclick="showTab('opt', this)">OPTIMIZERS</div>
         <div class="nav-tab" onclick="showTab('cheats', this)">CHEATS</div>
+        <div class="nav-tab" onclick="showTab('support', this)">SUPPORT</div>
         <div class="nav-tab" onclick="showTab('events', this)">EVENTS</div>
         <div class="nav-tab" onclick="showTab('info', this)">INFO</div>
         <div id="admin-tab" class="nav-tab special" style="display:none;" onclick="showTab('admin', this)">OWNER PANEL</div>
@@ -85,12 +88,12 @@
             <h2 style="font-family:'Orbitron'; letter-spacing:2px; margin-bottom:20px;">SYSTEM OPTIMIZATION</h2>
             <div class="panel">
                 <h3 style="font-family:'Orbitron';">NEUROHUB ELITE V6 (PC)</h3>
-                <p style="font-size:0.8rem; color:#666; line-height:1.6;">Full PC cleaning and latency reduction.</p>
+                <p style="font-size:0.8rem; color:#666;">Full PC cleaning and latency reduction.</p>
                 <a href="https://cdn.discordapp.com/attachments/1220455589808308254/1224814986424320141/NeuroHub_Elite.exe" class="btn">DOWNLOAD PC UTILITY</a>
             </div>
             <div class="panel">
                 <h3 style="font-family:'Orbitron'; color:var(--primary);">NEURO BROWSER OPTIMIZER</h3>
-                <p style="font-size:0.8rem; color:#666; line-height:1.6;">RAM Monitoring and 20+ browser-specific CMD tweaks.</p>
+                <p style="font-size:0.8rem; color:#666;">RAM Monitoring and 20+ browser-specific CMD tweaks.</p>
                 <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494860593985749154/browser_elite.exe?ex=69e424ea&is=69e2d36a&hm=61482f708d6b929c68c6054cfae2b34acc8f574ae7f56dbaf166b8496774fb5b&" class="btn btn-secondary">DOWNLOAD BROWSER TWEAKER</a>
             </div>
         </div>
@@ -101,6 +104,21 @@
                 <h3 style="color:var(--secondary); font-family:'Orbitron';">KOUR.IO INTERNAL</h3>
                 <p style="font-size:0.8rem; color:#666;">Aimbot, ESP, Movement. (Tampermonkey required).</p>
                 <a href="https://raw.githubusercontent.com/neuroswap/kour/main/kour_script.user.js" class="btn btn-secondary">INSTALL SCRIPT</a>
+            </div>
+            <div class="panel">
+                <h3 style="color:var(--primary); font-family:'Orbitron';">KRUNKER.IO ELITE</h3>
+                <p style="font-size:0.8rem; color:#666;">Premium Bypass: Silent Aim, ESP, No Recoil, and Wallbang exploitation.</p>
+                <a href="https://www.tampermonkey.net/script_installation.php#url=https://github.com/neuroswap/vghveF/raw/refs/heads/main/KRUNKER.IO.USER.JS" class="btn">INSTALL VIA TAMPERMONKEY</a>
+            </div>
+        </div>
+
+        <div id="support" class="tab-content">
+            <h2 style="font-family:'Orbitron';">SUPPORT TICKETS</h2>
+            <div class="panel">
+                <p style="font-size:0.8rem; color:#888;">Issue with a tool? Open a ticket below.</p>
+                <input type="text" id="ticket-subject" placeholder="Subject (e.g. Browser Tweaker Error)">
+                <textarea id="ticket-msg" rows="4" placeholder="Describe the issue..."></textarea>
+                <button class="btn btn-secondary" onclick="sendTicket()">SUBMIT TICKET</button>
             </div>
         </div>
 
@@ -121,7 +139,7 @@
         <div id="admin" class="tab-content">
             <h2 style="font-family:'Orbitron'; color:var(--secondary);">OWNER PANEL</h2>
             <div class="panel">
-                <input type="text" id="ban-id" placeholder="User ID" style="width:100%; padding:10px; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:white; margin-bottom:10px;">
+                <input type="text" id="ban-id" placeholder="User ID">
                 <button class="btn btn-secondary">BLACKLIST ID</button>
             </div>
         </div>
@@ -144,10 +162,21 @@
 
     function loginWithDiscord() {
         const clientID = "1494822241089880205";
-        // This ensures GitHub Pages URL is used correctly for redirect
         const redirect = encodeURIComponent(window.location.origin + window.location.pathname);
         const url = `https://discord.com/api/oauth2/authorize?client_id=${clientID}&redirect_uri=${redirect}&response_type=token&scope=identify%20guilds.join`;
         window.location.href = url;
+    }
+
+    function sendTicket() {
+        const id = localStorage.getItem('nID');
+        const nick = localStorage.getItem('nNick');
+        const subject = document.getElementById('ticket-subject').value;
+        const msg = document.getElementById('ticket-msg').value;
+        if(!subject || !msg) return alert("Fill all fields");
+        db.ref('tickets/').push({ uid: id, user: nick, subject: subject, message: msg, status: 'OPEN', time: Date.now() });
+        alert("Ticket Sent!");
+        document.getElementById('ticket-subject').value = "";
+        document.getElementById('ticket-msg').value = "";
     }
 
     window.onload = async () => {
