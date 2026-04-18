@@ -59,8 +59,8 @@
     <div class="auth-box">
         <img src="https://img.icons8.com/ios-filled/100/00f2ff/skull.png" style="width:80px; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));">
         <h2 style="font-family:'Orbitron'; color:var(--primary); letter-spacing:5px;">NEUROHUB</h2>
-        <p style="font-size:0.7rem; color:#444; margin-bottom:30px; letter-spacing:2px;">WELCOME TO THE INNER CIRCLE</p>
-        <button class="btn btn-discord" onclick="loginWithDiscord()">SIGN UP WITH DISCORD</button>
+        <p style="font-size:0.7rem; color:#444; margin-bottom:30px; letter-spacing:2px;">SIGN UP WITH DISCORD</p>
+        <button class="btn btn-discord" onclick="loginWithDiscord()">AUTHORIZE SESSION</button>
     </div>
 </div>
 
@@ -69,9 +69,9 @@
         <h2 style="font-family:'Orbitron'; color:var(--primary); text-align:center; font-size:1rem; margin-bottom:30px;">NEUROHUB</h2>
         
         <div class="nav-tab active" onclick="showTab('dash', this)">DASHBOARD</div>
-        <div class="nav-tab" onclick="showTab('opt', this)">OPTIMIZER</div>
+        <div class="nav-tab" onclick="showTab('opt', this)">OPTIMIZERS</div>
         <div class="nav-tab" onclick="showTab('cheats', this)">CHEATS</div>
-        <div class="nav-tab" onclick="showTab('events', this)">RELEASES</div>
+        <div class="nav-tab" onclick="showTab('events', this)">EVENTS</div>
         <div class="nav-tab" onclick="showTab('info', this)">INFO</div>
         <div id="admin-tab" class="nav-tab special" style="display:none;" onclick="showTab('admin', this)">OWNER PANEL</div>
 
@@ -89,120 +89,36 @@
         <div id="dash" class="tab-content active"><div id="welcome-area"></div></div>
 
         <div id="opt" class="tab-content">
-            <h2 style="font-family:'Orbitron'; letter-spacing:2px;">SYSTEM OPTIMIZATION</h2>
+            <h2 style="font-family:'Orbitron'; letter-spacing:2px; margin-bottom:20px;">SYSTEM OPTIMIZATION</h2>
+            
             <div class="panel">
-                <h3>NEUROHUB ELITE V6</h3>
+                <h3 style="font-family:'Orbitron';">NEUROHUB ELITE V6 (PC)</h3>
                 <p style="font-size:0.8rem; color:#666; line-height:1.6;">Full PC cleaning, Registry optimization, and Kernel-level latency reduction.</p>
-                <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494771426979221694/NeuroHub_V6_Elite.exe?ex=69e3d1df&is=69e2805f&hm=30b33810ca8741e2100c22616c82dec4008a9d07821cc1f0b088c9bc461058eb&" class="btn">DOWNLOAD .EXE</a>
+                <a href="https://cdn.discordapp.com/attachments/1220455589808308254/1224814986424320141/NeuroHub_Elite.exe" class="btn">DOWNLOAD PC UTILITY</a>
+            </div>
+
+            <div class="panel">
+                <h3 style="font-family:'Orbitron'; color:var(--primary);">NEURO BROWSER OPTIMIZER</h3>
+                <p style="font-size:0.8rem; color:#666; line-height:1.6;">Targeted tweaks for Chrome, Edge, and Brave. Includes RAM Monitoring and 20+ CMD tweaks.</p>
+                <a href="https://cdn.discordapp.com/attachments/1494771382188245186/1494860593985749154/browser_elite.exe?ex=69e424ea&is=69e2d36a&hm=61482f708d6b929c68c6054cfae2b34acc8f574ae7f56dbaf166b8496774fb5b&" class="btn btn-secondary">DOWNLOAD BROWSER TWEAKER</a>
             </div>
         </div>
 
         <div id="cheats" class="tab-content">
-            <h2 style="font-family:'Orbitron'; letter-spacing:2px;">GAME MODULES</h2>
+            <h2 style="font-family:'Orbitron'; letter-spacing:2px; margin-bottom:20px;">GAME MODULES</h2>
             <div class="panel">
-                <h3 style="color:var(--secondary);">KOUR.IO INTERNAL</h3>
+                <h3 style="color:var(--secondary); font-family:'Orbitron';">KOUR.IO INTERNAL</h3>
                 <p style="font-size:0.8rem; color:#666;">Aimbot, ESP, and Movement Exploits. Requires Tampermonkey.</p>
-                <a href=https://github.com/neuroswap/ddos/raw/refs/heads/main/kour-internal.user.js" class="btn btn-secondary">INSTALL VIA TAMPERMONKEY</a>
+                <a href="https://raw.githubusercontent.com/neuroswap/kour/main/kour_script.user.js" class="btn btn-secondary">INSTALL SCRIPT</a>
             </div>
         </div>
 
         <div id="events" class="tab-content">
-            <h2 style="font-family:'Orbitron';">realese</h2>
-            <div class="panel"><h3>krunker.io cheat realese</h3><p>17th of Friday @ 8:00 PM EST.</p></div>
+            <h2 style="font-family:'Orbitron';">COMMUNITY</h2>
+            <div class="panel"><h3>SCRIM NIGHT</h3><p>Every Friday @ 8:00 PM EST.</p></div>
         </div>
 
         <div id="info" class="tab-content">
             <h2 style="font-family:'Orbitron';">PROJECT INFO</h2>
             <div class="panel">
-                <p style="font-size:0.8rem; color:#888;"><b>Status:</b> Undetected</p>
-                <p style="font-size:0.8rem; color:#888;"><b>Build:</b> Stable</p>
-                <p style="font-size:0.8rem; color:#888;"><b>Developer:</b> Zayden / Neuro </p>
-                <p style="font-size:0.8rem; color:#888; margin-top:15px;">NeuroHub is built for performance and competitive advantage.</p>
-            </div>
-        </div>
-
-        <div id="admin" class="tab-content">
-            <h2 style="font-family:'Orbitron'; color:var(--secondary);">OWNER</h2>
-            <div class="panel">
-                <input type="text" id="ban-id" placeholder="User ID" style="width:100%; padding:10px; background:rgba(0,0,0,0.5); border:1px solid var(--border); color:white; margin-bottom:10px;">
-                <button class="btn btn-secondary" onclick="banUser()">BLACKLIST ID</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyC-tWfooosC689hzDUC4S5CXL7dJ3yANuc",
-        authDomain: "neuro-chat-8fe18.firebaseapp.com",
-        databaseURL: "https://neuro-chat-8fe18-default-rtdb.firebaseio.com",
-        projectId: "neuro-chat-8fe18",
-        storageBucket: "neuro-chat-8fe18.firebasestorage.app",
-        messagingSenderId: "490069277437",
-        appId: "1:490069277437:web:c17aaa860bf4ecfd7b1c94"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const OWNER_ID = "1494822241089880205"; 
-
-    function loginWithDiscord() {
-        const url = `https://discord.com/api/oauth2/authorize?client_id=1494822241089880205&redirect_uri=${encodeURIComponent(window.location.origin + window.location.pathname)}&response_type=token&scope=identify%20guilds.join`;
-        window.location.href = url;
-    }
-
-    window.onload = async () => {
-        const fragment = new URLSearchParams(window.location.hash.slice(1));
-        const accessToken = fragment.get('access_token');
-
-        if (accessToken) {
-            const resp = await fetch('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${accessToken}` } });
-            const user = await resp.json();
-            if (user.id) {
-                const nick = user.global_name || user.username;
-                localStorage.setItem('nID', user.id);
-                localStorage.setItem('nNick', nick);
-                localStorage.setItem('nPFP', `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`);
-                db.ref('logins/' + user.id).set({ id: user.id, username: user.username, nickname: nick, time: Date.now() });
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }
-
-        const id = localStorage.getItem('nID');
-        if (id) {
-            document.getElementById('auth-gate').style.display = 'none';
-            document.getElementById('main-ui').style.display = 'grid';
-            const nick = localStorage.getItem('nNick');
-            document.getElementById('pill-name').innerText = nick;
-            document.getElementById('pill-img').src = localStorage.getItem('nPFP');
-            document.getElementById('welcome-area').innerHTML = `
-                <div style="margin-top:50px; text-align:center;">
-                    <img src="${localStorage.getItem('nPFP')}" style="width:110px; border-radius:50%; border:2px solid var(--primary); margin-bottom:25px;">
-                    <h1 style="font-family:'Orbitron'; letter-spacing: 4px; font-size:1.8rem;">WELCOME <span style="color:var(--primary);">${nick.toUpperCase()}</span></h1>
-                    <h2 style="font-family:'Orbitron'; color:var(--secondary); letter-spacing:6px; font-size:1rem; opacity:0.7;">TO THE FUTURE OF CHEATING</h2>
-                </div>
-            `;
-            if (id === OWNER_ID) document.getElementById('admin-tab').style.display = 'flex';
-        }
-        initStars(); drawStars();
-    };
-
-    function showTab(t, el) { 
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
-        document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    function toggleLogout() {
-        const menu = document.getElementById('l-menu');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    }
-
-    function logout() { localStorage.clear(); location.reload(); }
-
-    const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d'); let stars = [];
-    function initStars() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; stars = []; for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, l:Math.random()*25+10, s:Math.random()*12+5}); }
-    function drawStars() { ctx.clearRect(0,0,canvas.width, canvas.height); stars.forEach(s => { ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x, s.y+s.l); ctx.stroke(); s.y += s.s; if(s.y > canvas.height) s.y = -s.l; }); requestAnimationFrame(drawStars); }
-</script>
-</body>
-</html>
+                <p style="font-size:0.8rem; color:#888;"><b>Status:
