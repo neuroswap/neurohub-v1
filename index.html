@@ -46,7 +46,6 @@
         .content-area { padding: 50px; overflow-y: auto; position: relative; height: 100vh; }
         .tab-content { display: none; animation: fadeIn 0.4s ease forwards; width: 100%; }
         
-        /* Dashboard Centering Logic */
         #dash.active { display: flex !important; align-items: center; justify-content: center; text-align: center; flex-direction: column; height: 100%; }
         .tab-content.active:not(#dash) { display: block !important; }
 
@@ -102,7 +101,6 @@
         <div class="nav-tab" onclick="showTab('opt', this)">OPTIMIZERS</div>
         <div class="nav-tab" onclick="showTab('cheats', this)">CHEATS</div>
         <div class="nav-tab" onclick="showTab('info', this)">INFO</div>
-        
         <div id="admin-tab" class="nav-tab special" style="display:none;" onclick="showTab('admin', this)">OWNER PANEL</div>
 
         <div class="user-pill" onclick="logout()">
@@ -139,11 +137,10 @@
             </div>
             
             <div id="cheat-browser" class="cheat-sub-content active">
-                
                 <div class="panel" style="border-color: var(--primary);">
                     <h3 style="font-family:'Orbitron'; margin-bottom: 20px;">KOUR.IO INTERNAL</h3>
                     
-                    <img src="image_0.png" alt="NeuroHub Kour.io Cheat Menu" style="width: 100%; max-width: 400px; display: block; margin: 0 auto 20px auto; border-radius: 8px; border: 1px solid var(--border);">
+                    <img src="https://i.postimg.cc/XNRC2Rvf/Capture.png" alt="NeuroHub Kour.io Cheat Menu" style="width: 100%; max-width: 400px; display: block; margin: 0 auto 20px auto; border-radius: 8px; border: 1px solid var(--border);">
                     
                     <p style="font-size:0.8rem; color:#666; text-align: center;">Aimbot, ESP, Radar, Triggerbot, and Custom Crosshair. (Tampermonkey required).</p>
                     <a href="https://raw.githubusercontent.com/neuroswap/kour/main/kour_script.user.js" class="btn btn-secondary">INSTALL KOUR</a>
