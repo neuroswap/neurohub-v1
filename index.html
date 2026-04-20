@@ -44,7 +44,7 @@
 
         .modal-img { width: 100%; border-radius: 12px; border: 1px solid var(--primary); box-shadow: 0 0 20px rgba(0, 242, 255, 0.1); }
         
-        .review-section { flex-grow: 1; margin-top: 15px; overflow-y: auto; max-height: 250px; }
+        .review-section { flex-grow: 1; margin-top: 15px; overflow-y: auto; max-height: 250px; padding-right: 10px; }
         .review-item { background: rgba(255,255,255,0.02); border: 1px solid #111; padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 0.75rem; }
         .stars { color: #ffd700; font-size: 0.7rem; margin-bottom: 5px; }
 
@@ -107,23 +107,13 @@
 
         <div class="modal-right">
             <h2 id="m-title" style="font-family:'Orbitron'; margin:0; color:var(--primary); font-size:1.4rem;">PRODUCT</h2>
-            <div style="font-size:0.7rem; color:var(--secondary); margin-top:5px; font-family:'Orbitron';">STATUS: UNDETECTED</div>
+            <div id="m-status" style="font-size:0.7rem; color:var(--secondary); margin-top:5px; font-family:'Orbitron';">STATUS: UNDETECTED</div>
             
             <p id="m-desc" style="font-size:0.8rem; color:#666; line-height:1.6; margin:20px 0;"></p>
 
             <h4 style="font-family:'Orbitron'; font-size:0.65rem; color:#444; margin-bottom:10px; letter-spacing:1px;">USER REVIEWS</h4>
-            <div class="review-section">
-                <div class="review-item">
-                    <div class="stars">★★★★★</div>
-                    <div style="color:#eee; margin-bottom:4px;">"Actual beast of a script, visual are clean."</div>
-                    <div style="color:#444; font-size:0.6rem;">— Ghost_User22</div>
+            <div id="review-container" class="review-section">
                 </div>
-                <div class="review-item">
-                    <div class="stars">★★★★★</div>
-                    <div style="color:#eee; margin-bottom:4px;">"Undetected for 2 weeks now. Zayden cooked."</div>
-                    <div style="color:#444; font-size:0.6rem;">— EliteViper</div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -182,6 +172,7 @@
             <div class="sub-nav">
                 <div class="sub-tab active" onclick="showSubTab('cheat-browser', this)">BROWSER</div>
                 <div class="sub-tab" onclick="showSubTab('cheat-roblox', this)">ROBLOX</div>
+                <div class="sub-tab" onclick="showSubTab('cheat-cs2', this)">CS2</div>
             </div>
             
             <div id="cheat-browser" class="cheat-sub-content active">
@@ -191,15 +182,14 @@
                             <h3 style="font-family:'Orbitron'; color:var(--primary); font-size:1rem;">KOUR.IO INTERNAL</h3>
                             <p style="font-size:0.7rem; color:#555;">Advanced aimbot & visuals.</p>
                         </div>
-                        <button class="btn" onclick="openProduct('KOUR.IO INTERNAL', 'https://i.postimg.cc/XNRC2Rvf/Capture.png', 'The definitive internal script for Kour.io. Features include predictive aimbot, full box ESP, player radar, and instant triggerbot. Designed for stealth.', 'https://raw.githubusercontent.com/neuroswap/kour/main/kour_script.user.js')">GET PRODUCT</button>
+                        <button class="btn" onclick="openProduct('KOUR.IO INTERNAL', 'https://i.postimg.cc/XNRC2Rvf/Capture.png', 'The definitive internal script for Kour.io. Features include predictive aimbot, full box ESP, player radar, and instant triggerbot.', 'https://raw.githubusercontent.com/neuroswap/kour/main/kour_script.user.js', 'UNDETECTED', 'kour')">GET PRODUCT</button>
                     </div>
-
                     <div class="cheat-card">
                         <div>
                             <h3 style="font-family:'Orbitron'; font-size:1rem;">KRUNKER.IO ELITE</h3>
                             <p style="font-size:0.7rem; color:#555;">Silent Aim & ESP module.</p>
                         </div>
-                        <button class="btn" onclick="openProduct('KRUNKER.IO ELITE', 'https://img.icons8.com/ios-filled/100/00f2ff/skull.png', 'High performance Krunker internal script with advanced ESP features and movement exploits.', 'https://github.com/neuroswap/vghveF/raw/refs/heads/main/KRUNKER.IO.USER.JS')">GET PRODUCT</button>
+                        <button class="btn" onclick="openProduct('KRUNKER.IO ELITE', 'https://img.icons8.com/ios-filled/100/00f2ff/skull.png', 'High performance Krunker internal script with advanced ESP features.', 'https://github.com/neuroswap/vghveF/raw/refs/heads/main/KRUNKER.IO.USER.JS', 'UNDETECTED', 'krunker')">GET PRODUCT</button>
                     </div>
                 </div>
             </div>
@@ -208,7 +198,19 @@
                 <div class="product-grid">
                     <div class="cheat-card">
                         <div><h3 style="font-family:'Orbitron';">XENO EXECUTOR</h3><p style="font-size:0.7rem; color:#555;">Level 7 Windows executor.</p></div>
-                        <button class="btn" onclick="openProduct('XENO EXECUTOR', 'https://xeno.onl/logo.png', 'The most stable free executor currently available for Windows users.', 'https://xeno.onl')">GET PRODUCT</button>
+                        <button class="btn" onclick="openProduct('XENO EXECUTOR', 'https://xeno.onl/logo.png', 'The most stable free executor currently available for Windows users.', 'https://xeno.onl', 'UNDETECTED', 'xeno')">GET PRODUCT</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cheat-cs2" class="cheat-sub-content">
+                <div class="product-grid">
+                    <div class="cheat-card">
+                        <div style="opacity:0.5;">
+                            <h3 style="font-family:'Orbitron'; color:var(--secondary); font-size:1rem;">NEURO-CS2 EXTERNAL</h3>
+                            <p style="font-size:0.7rem; color:#555;">VAC-Live Bypass & Kernel ESP.</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="openProduct('NEURO-CS2 EXTERNAL', 'https://img.icons8.com/ios-filled/100/ff007f/lock.png', 'This product is currently in private beta testing. Once the VAC-Live bypass is verified, it will be released to Elite users.', '#', 'LOCKED (UNDER DEVELOPMENT)', 'cs2')">GET PRODUCT</button>
                     </div>
                 </div>
             </div>
@@ -232,16 +234,65 @@
     const db = firebase.database();
     const OWNER_ID = "1486348575536582736"; 
 
-    function openProduct(title, img, desc, link) {
+    // REAL REVIEW DATA OBJECT
+    const reviewsData = {
+        kour: [
+            { user: "Ghost_User22", text: "Actual beast of a script, visuals are clean.", stars: 5 },
+            { user: "EliteViper", text: "Undetected for 2 weeks now. Zayden cooked.", stars: 5 }
+        ],
+        krunker: [
+            { user: "ShottyMain", text: "Best silent aim on the market. Highly recommend.", stars: 4 },
+            { user: "ZeroGravity", text: "Smooth movement and no lag.", stars: 5 }
+        ],
+        xeno: [
+            { user: "RobloxDev", text: "Stable execution, runs almost every script.", stars: 5 }
+        ],
+        cs2: [
+            { user: "System", text: "PRODUCT LOCKED - ACCESS RESTRICTED TO DEVELOPERS.", stars: 0 }
+        ]
+    };
+
+    function openProduct(title, img, desc, link, status, id) {
         document.getElementById('m-title').innerText = title;
         document.getElementById('m-img').src = img;
         document.getElementById('m-desc').innerText = desc;
-        document.getElementById('m-link').href = link;
+        document.getElementById('m-status').innerText = "STATUS: " + status;
+        
+        const installBtn = document.getElementById('m-link');
+        
+        // Handle Locked State
+        if(status.includes("LOCKED")) {
+            installBtn.innerText = "PRODUCT LOCKED";
+            installBtn.style.background = "#222";
+            installBtn.style.color = "#444";
+            installBtn.onclick = (e) => { e.preventDefault(); alert("PRODUCT UNDER DEVELOPMENT"); };
+        } else {
+            installBtn.innerText = "INSTALL NOW";
+            installBtn.style.background = "var(--primary)";
+            installBtn.style.color = "#000";
+            installBtn.href = link;
+            installBtn.onclick = null;
+        }
+
+        // Injects specific reviews
+        const container = document.getElementById('review-container');
+        container.innerHTML = "";
+        const reviews = reviewsData[id] || [];
+        reviews.forEach(r => {
+            const starText = "★".repeat(r.stars) + "☆".repeat(5 - r.stars);
+            container.innerHTML += `
+                <div class="review-item">
+                    <div class="stars">${starText}</div>
+                    <div style="color:#eee; margin-bottom:4px;">"${r.text}"</div>
+                    <div style="color:#444; font-size:0.6rem;">— ${r.user}</div>
+                </div>
+            `;
+        });
+
         document.getElementById('product-modal').style.display = 'flex';
     }
 
     function closeProduct() { document.getElementById('product-modal').style.display = 'none'; }
-
     function checkTos() { if (localStorage.getItem('tos_accepted')) loginWithDiscord(); else document.getElementById('tos-overlay').style.display = 'flex'; }
     function acceptTos() { localStorage.setItem('tos_accepted', 'true'); document.getElementById('tos-overlay').style.display = 'none'; loginWithDiscord(); }
     function loginWithDiscord() { const clientID = "1494822241089880205"; const currentPath = window.location.origin + window.location.pathname; const redirect = encodeURIComponent(currentPath); const url = `https://discord.com/api/oauth2/authorize?client_id=${clientID}&redirect_uri=${redirect}&response_type=token&scope=identify%20guilds.join`; window.location.href = url; }
